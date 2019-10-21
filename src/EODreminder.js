@@ -129,12 +129,17 @@ const writeTime = (clock) => {
   fs.writeFileSync(clockPath, time, 'utf8');
 };
 
+const waitForNextReminder = () => {
+  
+}
+
 // Ticks each second, checks if appropriate time to send EOD and writes the time to text file
 function tickTock() {
   const clock = DateTime.local();
-  writeTime(clock);
-  checkTime(clock);
-  setTimeout(tickTock, 1000);
+  waitForNextReminder();
+  //writeTime(clock);
+  //checkTime(clock);
+  //setTimeout(tickTock, 1000);
 }
 
 tickTock();
