@@ -20,23 +20,27 @@ DateTime.local().setZone('America/Toronto'); //Set your timezone here
 
 const { execSync } = require('child_process');
 const { WebClient } = require('@slack/client');
-const cpCommand = `cp ../config-files/RAs.txt ../config-files/sleepyRAs.txt`;
-const slack_token = fs.readFileSync(path.resolve(__dirname, '../config-files/SLACK_TOKEN'), 'utf8');
-const web = new WebClient(slack_token);
-const channelIDs = require(`../config-files/channelID.json`);
+const cpCommand = 'cp ../config-files/RAs.txt ../config-files/sleepyRAs.txt';
+const slackToken = fs.readFileSync(path.resolve(__dirname, '../config-files/SLACK_TOKEN'), 'utf8');
+const web = new WebClient(slackToken);
+const channelIDs = require('../config-files/channelID.json');
+const EODReminders = require('../config-files/EODReminderTimes.json');
+const sleepyRANames = fs.readFileSync(path.resolve(__dirname, '../config-files/sleepyRAs.txt')).toString().split('\n');
+
+const clock = DateTime.local();
+
 
 // Sends EOD message to RA if they haven't already submitted their EOD that work day
 const sendEOD = (RA, message) => {
-  const names = fs.readFileSync(path.resolve(__dirname, '../config-files/sleepyRAs.txt')).toString().split('\n');
-  names.forEach((name) => {
+  sleepyRANames.forEach((name) => {
     if (name === RA) {
       web.chat.postMessage({ channel: channelIDs[RA], text: message });
     }
   });
 };
 
-//sendEOD ("naiuhz", "OSTEPPY Rebooted! :robot_face:");
-
+//console.log(EODReminders['naiuhz']);
+//console.log(sleepyRANames);
 
 // Exported function used in slash command
 module.exports.sendDM = (RA, message) => {
@@ -51,14 +55,24 @@ const resetRAList = () => {
 
 
 const waitForNextReminder = () => {
-  
+  let nextReminderSeconds = 604800;
+  sleepyRANames.forEach((name) => {
+    let reminderArr = EODReminders[name];
+    if (reminderArr !== undefined){
+      reminderArr.forEach((reminder) => {
+        console.log (reminder);
+        console.log ("Current. Weekday:" + clock.weekday + ", " + clock.hour + ":" + clock.minute);
+      });
+    }
+  });
+
 }
 
 // Ticks each second, checks if appropriate time to send EOD and writes the time to text file
 function tickTock() {
   const clock = DateTime.local();
-  waitForNextReminder();
   //setTimeout(tickTock, 1000);
 }
 
-tickTock();
+waitForNextReminder();
+//tickTock();
