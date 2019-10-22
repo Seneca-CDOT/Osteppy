@@ -1,20 +1,18 @@
 Handles EOD slash commands and sends EOD reminders
 
+### Initial setup
+
+`npm install`
+
 ### Dev Run
 
 `npm run dev`
-
-### Docker
-
-`docker build -t slack-service .`
-
-`docker run -p 8081:2001 -d slack-service`
 
 ## Instructions
 
 ## Set Osteppy environment token
 
-Add this code local to the src folder: `ostep-dashboard/Osteppy/src`: 
+Add this code local to the src folder: `Osteppy/src`: 
 
 SLACK_TOKEN="TOKEN_VALUE"
 
