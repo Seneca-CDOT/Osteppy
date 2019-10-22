@@ -15,8 +15,8 @@
 
 const fs = require('fs');
 const path = require('path');
-const { DateTime } = require('luxon');
-DateTime.local().setZone('America/Toronto'); //Set your timezone here
+//const { DateTime } = require('luxon');
+//DateTime.local().setZone('America/Toronto'); //Set your timezone here
 
 const { execSync } = require('child_process');
 const { WebClient } = require('@slack/client');
@@ -27,8 +27,7 @@ const channelIDs = require('../config-files/channelID.json');
 const EODReminders = require('../config-files/EODReminderTimes.json');
 const sleepyRANames = fs.readFileSync(path.resolve(__dirname, '../config-files/sleepyRAs.txt')).toString().split('\n');
 
-const clock = DateTime.local();
-
+var today = new Date();
 
 // Sends EOD message to RA if they haven't already submitted their EOD that work day
 const sendEOD = (RA, message) => {
@@ -56,23 +55,38 @@ const resetRAList = () => {
 
 const waitForNextReminder = () => {
   let nextReminderSeconds = 604800;
+  let nextReminderTime = Array(2);
+  let nextReminders = [];
   sleepyRANames.forEach((name) => {
     let reminderArr = EODReminders[name];
     if (reminderArr !== undefined){
       reminderArr.forEach((reminder) => {
-        console.log (reminder);
-        console.log ("Current. Weekday:" + clock.weekday + ", " + clock.hour + ":" + clock.minute);
+        let reminderTime = reminder["time"].split(":");
+        let reminderDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), reminderTime[0], reminderTime[1], 0);
+        let reminderDiff = Math.floor((reminderDate - today)/ 1000);//.toString();
+        if (reminderDiff > 0 && reminderDiff < nextReminderSeconds) {
+          nextReminderSeconds = reminderDiff;
+          nextReminderTime[0] = reminderTime[0];
+          nextReminderTime[1] = reminderTime[1];
+        }
+      });
+    }
+  });
+  sleepyRANames.forEach((name) => {
+    let reminderArr = EODReminders[name];
+    if (reminderArr !== undefined){
+      reminderArr.forEach((reminder) => {
+        let reminderTime = reminder["time"].split(":");
+        if (reminderTime[0] === nextReminderTime[0] && reminderTime[1] === nextReminderTime[1]){
+          nextReminders.push([name, reminder["message"]]);
+        }
       });
     }
   });
 
+  console.log (nextReminders);
+
 }
 
-// Ticks each second, checks if appropriate time to send EOD and writes the time to text file
-function tickTock() {
-  const clock = DateTime.local();
-  //setTimeout(tickTock, 1000);
-}
 
 waitForNextReminder();
-//tickTock();
