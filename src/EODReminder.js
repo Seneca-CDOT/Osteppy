@@ -38,6 +38,18 @@ const sendEOD = (RA, message) => {
   });
 };
 
+const sendEODs = (reminders) => {
+  console.log(reminders);
+  for (var i = 0; i < reminders.length; i++){
+    let reminder = reminders[i];
+    console.log(reminder[0] + ": " + reminder[1]);
+    //web.chat.postMessage({ channel: channelIDs[reminder[0]], text: reminder[1] });
+  }
+  /*reminders.forEach((reminder) => {
+    web.chat.postMessage({ channel: channelIDs[reminder[0]], text: reminder[1] });
+  });*/
+}
+
 //console.log(EODReminders['naiuhz']);
 //console.log(sleepyRANames);
 
@@ -58,9 +70,10 @@ const waitForNextReminder = () => {
   let nextReminderTime = Array(2);
   let nextReminders = [];
   sleepyRANames.forEach((name) => {
-    let reminderArr = EODReminders[name];
-    if (reminderArr !== undefined){
-      reminderArr.forEach((reminder) => {
+    if (EODReminders[name] !== undefined){
+      let reminderArr = EODReminders[name]["reminders"];
+      for (var i = 0; i < reminderArr.length; i++){
+        let reminder = reminderArr[i];
         let reminderTime = reminder["time"].split(":");
         let reminderDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), reminderTime[0], reminderTime[1], 0);
         let reminderDiff = Math.floor((reminderDate - today)/ 1000);//.toString();
@@ -69,22 +82,43 @@ const waitForNextReminder = () => {
           nextReminderTime[0] = reminderTime[0];
           nextReminderTime[1] = reminderTime[1];
         }
-      });
+      }
+      
+      /*reminderArr[0].forEach((reminder) => {
+        let reminderTime = reminder["time"].split(":");
+        let reminderDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), reminderTime[0], reminderTime[1], 0);
+        let reminderDiff = Math.floor((reminderDate - today)/ 1000);//.toString();
+        if (reminderDiff > 0 && reminderDiff < nextReminderSeconds) {
+          nextReminderSeconds = reminderDiff;
+          nextReminderTime[0] = reminderTime[0];
+          nextReminderTime[1] = reminderTime[1];
+        }
+      });*/
     }
   });
+
   sleepyRANames.forEach((name) => {
-    let reminderArr = EODReminders[name];
-    if (reminderArr !== undefined){
-      reminderArr.forEach((reminder) => {
+    if (EODReminders[name] !== undefined){
+      let reminderArr = EODReminders[name]["reminders"];
+      for (var i = 0; i < reminderArr.length; i++){
+        let reminder = reminderArr[i];
         let reminderTime = reminder["time"].split(":");
         if (reminderTime[0] === nextReminderTime[0] && reminderTime[1] === nextReminderTime[1]){
           nextReminders.push([name, reminder["message"]]);
         }
-      });
+      }
     }
   });
-
   console.log (nextReminders);
+
+
+  for (var i = 0; i < nextReminders.length; i++){
+    let reminder = nextReminders[i];
+    console.log(reminder[0] + ": " + reminder[1]);
+    //web.chat.postMessage({ channel: channelIDs[reminder[0]], text: reminder[1] });
+  }
+
+  //setTimeout(sendEODs, nextReminderSeconds);
 
 }
 
