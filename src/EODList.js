@@ -42,6 +42,7 @@ class EODList {
     return Promise.all([
       fs.writeFile(this.dataFile, JSON.stringify(this.reportData)),
       fs.writeFile(this.unsubmittedNamesFile, this.unsubmittedNames.join("\n"))
+      
     ]);
   }
 
