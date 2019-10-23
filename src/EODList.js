@@ -1,7 +1,8 @@
-import path from "path";
-import { promises as fs } from "fs";
 
-export default class EODList {
+const path = require("path");
+const fs = require("fs");
+
+class EODList {
   constructor({
     dataFile = path.join(__dirname, "../config-files/eods.json"),
     unsubmittedNamesFile = path.join(__dirname, "../config-files/sleepyRAs.txt"),
@@ -11,12 +12,17 @@ export default class EODList {
     this.dataFile = dataFile;
     this.unsubmittedNames = [];
     this.unsubmittedNamesFile = unsubmittedNamesFile;
+    this.EODReminderTimes = EODReminderTimes;
   }
 
   async load() {
     const results = await Promise.all([
       fs.readFile(this.dataFile, { encoding: "utf8", flag: "a+" }),
       fs.readFile(this.unsubmittedNamesFile, {
+        encoding: "utf8",
+        flag: "a+"
+      }),
+      fs.readFile(this.EODReminderTimes, {
         encoding: "utf8",
         flag: "a+"
       })
@@ -56,6 +62,7 @@ export default class EODList {
   //Adds or overwrites an EOD reminder
   //Given: name, reminder formatted as TIME WEEKDAYS MESSAGE
   add(name, reminder) {
+    console.log(this.EODReminderTimes);
     if (this.EODReminderTimes[name] !== undefined){
       console.log(name + " found.");
     } else {
@@ -64,3 +71,5 @@ export default class EODList {
     const reminders = this.EODReminderTimes[name];
   }
 }
+
+module.exports = EODList;
