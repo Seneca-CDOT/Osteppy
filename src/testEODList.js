@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import EODList from './EODList';
+const EODList = require('./EODList');
 
 const EOD = new EODList();
 
