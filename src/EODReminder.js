@@ -10,13 +10,9 @@
  * OSTEP Research Assistants
  **************************************************** */
 
-// Javascript version of remindEOD.py
-
 
 const fs = require('fs');
 const path = require('path');
-//const { DateTime } = require('luxon');
-//DateTime.local().setZone('America/Toronto'); //Set your timezone here
 
 const { execSync } = require('child_process');
 const { WebClient } = require('@slack/client');
@@ -29,44 +25,27 @@ const sleepyRANames = fs.readFileSync(path.resolve(__dirname, '../config-files/s
 
 var today = new Date();
 
-// Sends EOD message to RA if they haven't already submitted their EOD that work day
-const sendEOD = (RA, message) => {
-  sleepyRANames.forEach((name) => {
-    if (name === RA) {
-      web.chat.postMessage({ channel: channelIDs[RA], text: message });
-    }
-  });
-};
-
+// Local function used to send EOD reminders
 const sendEODs = (reminders) => {
-  console.log(reminders);
   for (var i = 0; i < reminders.length; i++){
     let reminder = reminders[i];
-    console.log(reminder[0] + ": " + reminder[1]);
-    //web.chat.postMessage({ channel: channelIDs[reminder[0]], text: reminder[1] });
-  }
-  /*reminders.forEach((reminder) => {
     web.chat.postMessage({ channel: channelIDs[reminder[0]], text: reminder[1] });
-  });*/
+  }
 }
-
-//console.log(EODReminders['naiuhz']);
-//console.log(sleepyRANames);
 
 // Exported function used in slash command
 module.exports.sendDM = (RA, message) => {
   web.chat.postMessage({ channel: channelIDs[RA], text: message });
 };
 
-
 // Resets RA list in the morning of a weekday
 const resetRAList = () => {
   execSync(cpCommand);
 };
 
-
-const waitForNextReminder = () => {
-  let nextReminderSeconds = 604800;
+// Sends the next successive EOD reminders
+const sendNextReminders = () => {
+  let nextReminderSeconds = 604800000000;
   let nextReminderTime = Array(2);
   let nextReminders = [];
   sleepyRANames.forEach((name) => {
@@ -74,26 +53,17 @@ const waitForNextReminder = () => {
       let reminderArr = EODReminders[name]["reminders"];
       for (var i = 0; i < reminderArr.length; i++){
         let reminder = reminderArr[i];
-        let reminderTime = reminder["time"].split(":");
-        let reminderDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), reminderTime[0], reminderTime[1], 0);
-        let reminderDiff = Math.floor((reminderDate - today)/ 1000);//.toString();
-        if (reminderDiff > 0 && reminderDiff < nextReminderSeconds) {
-          nextReminderSeconds = reminderDiff;
-          nextReminderTime[0] = reminderTime[0];
-          nextReminderTime[1] = reminderTime[1];
+        if (reminder["weekday"].includes(today.getDay())){
+          let reminderTime = reminder["time"].split(":");
+          let reminderDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), reminderTime[0], reminderTime[1], 0);
+          let reminderDiff = reminderDate - today;
+          if (reminderDiff > 0 && reminderDiff < nextReminderSeconds) {
+            nextReminderSeconds = reminderDiff;
+            nextReminderTime[0] = reminderTime[0];
+            nextReminderTime[1] = reminderTime[1];
+          }
         }
       }
-      
-      /*reminderArr[0].forEach((reminder) => {
-        let reminderTime = reminder["time"].split(":");
-        let reminderDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), reminderTime[0], reminderTime[1], 0);
-        let reminderDiff = Math.floor((reminderDate - today)/ 1000);//.toString();
-        if (reminderDiff > 0 && reminderDiff < nextReminderSeconds) {
-          nextReminderSeconds = reminderDiff;
-          nextReminderTime[0] = reminderTime[0];
-          nextReminderTime[1] = reminderTime[1];
-        }
-      });*/
     }
   });
 
@@ -103,24 +73,18 @@ const waitForNextReminder = () => {
       for (var i = 0; i < reminderArr.length; i++){
         let reminder = reminderArr[i];
         let reminderTime = reminder["time"].split(":");
-        if (reminderTime[0] === nextReminderTime[0] && reminderTime[1] === nextReminderTime[1]){
+        if (reminder["weekday"].includes(today.getDay()) && reminderTime[0] === nextReminderTime[0] && reminderTime[1] === nextReminderTime[1]){
           nextReminders.push([name, reminder["message"]]);
         }
       }
     }
   });
-  console.log (nextReminders);
 
+  console.log ("DEBUG nextReminders: " + nextReminders);
 
-  for (var i = 0; i < nextReminders.length; i++){
-    let reminder = nextReminders[i];
-    console.log(reminder[0] + ": " + reminder[1]);
-    //web.chat.postMessage({ channel: channelIDs[reminder[0]], text: reminder[1] });
-  }
-
-  //setTimeout(sendEODs, nextReminderSeconds);
+  setTimeout(function(){sendEODs(nextReminders);}, nextReminderSeconds);
 
 }
 
 
-waitForNextReminder();
+sendNextReminders();
