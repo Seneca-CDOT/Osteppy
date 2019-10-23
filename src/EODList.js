@@ -3,8 +3,8 @@ import { promises as fs } from "fs";
 
 export default class EODList {
   constructor({
-    dataFile = path.join(__dirname, "eods.json"),
-    unsubmittedNamesFile = path.join(__dirname, "sleepyRAs.txt")
+    dataFile = path.join(__dirname, "../config-files/eods.json"),
+    unsubmittedNamesFile = path.join(__dirname, "../config-files/sleepyRAs.txt")
   } = {}) {
     this.reportData = {};
     this.dataFile = dataFile;

@@ -12,7 +12,7 @@
 
 import cp from 'child_process';
 import http from 'http';
-import path from 'path';
+//import path from 'path';
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
@@ -20,11 +20,11 @@ import bodyParser from 'body-parser';
 import axios from 'axios';
 import fs from 'fs';
 
-import EODList from './EODList';
+import EODList from '../config-files/EODList';
 
-import config from './config.json';
+import config from '../config-files/config.json';
 
-const clockPath = path.join(__dirname, 'clock.txt');
+//const clockPath = path.join(__dirname, 'clock.txt');
 
 const EOD = new EODList();
 
@@ -35,13 +35,13 @@ function checkJSScript() {
 }
 
 // Reads clock.txt to return the time
-function checkEODClock() {
+/*function checkEODClock() {
   if (fs.existsSync(clockPath)) {
     const contents = fs.readFileSync(clockPath, 'utf8');
     return (contents);
   }
   return ('Error: Clock does not exist!');
-}
+}*/
 
 cp.fork(`${__dirname}/EODreminder.js`);
 
@@ -140,7 +140,7 @@ app.post('/check_js_script', (req, res) => {
 });
 
 // Slash command for checking remindEOD.py's time
-app.post('/check_eod_time', (req, res) => {
+/*app.post('/check_eod_time', (req, res) => {
   const slackRequest = req.body;
 
   const time = checkEODClock();
@@ -162,7 +162,7 @@ app.post('/check_eod_time', (req, res) => {
     });
 
   res.status(200).send();
-});
+});*/
 
 /** Get EODs */
 app.get('/eod', (req, res) => {
