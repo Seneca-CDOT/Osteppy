@@ -18,11 +18,11 @@ import cors from 'cors';
 import morgan from 'morgan';
 import bodyParser from 'body-parser';
 import axios from 'axios';
-import fs from 'fs';
+//import fs from 'fs';
 
-import EODList from '../config-files/EODList';
+import EODList from './EODList';
 
-import config from '../config-files/config.json';
+import config from './config.json';
 
 //const clockPath = path.join(__dirname, 'clock.txt');
 
@@ -115,8 +115,39 @@ app.post('/eod_left', (req, res) => {
   res.status(200).send();
 });
 
+// Slash command for submitting EOD's
+app.post('/add_eod_reminder', (req, res) => {
+  const slackRequest = req.body;
+
+  //parseReminder(req.body)
+
+  const reminder_parsed;
+
+  const slackResponse = {
+    response_type: 'in_channel',
+    text: `:Added EOD Reminder: `,
+    attachments: [
+      {
+        text: `${slackRequest.text}`,
+      },
+    ],
+  };
+
+  axios
+    .post(slackRequest.response_url, slackResponse)
+    .then(() => EOD.submit(slackRequest.user_name, {
+      time: new Date(),
+      text: slackRequest.text,
+      channel: slackRequest.channel_name,
+    })).catch((error) => {
+      console.log(`error: ${error}`);
+    });
+
+  res.status(200).send();
+});
+
 // Slash command for checking if remindEOD.js script is still running or not
-app.post('/check_js_script', (req, res) => {
+/*app.post('/check_js_script', (req, res) => {
   const slackRequest = req.body;
   const message = checkJSScript();
 
@@ -137,7 +168,7 @@ app.post('/check_js_script', (req, res) => {
     });
 
   res.status(200).send();
-});
+});*/
 
 // Slash command for checking remindEOD.py's time
 /*app.post('/check_eod_time', (req, res) => {
