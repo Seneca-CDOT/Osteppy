@@ -80,7 +80,7 @@ const sendNextReminders = () => {
     }
   });
 
-  console.log ("DEBUG nextReminders: " + nextReminders);
+  //console.log ("DEBUG nextReminders: " + nextReminders);
 
   setTimeout(function(){sendEODs(nextReminders);}, nextReminderSeconds);
 
