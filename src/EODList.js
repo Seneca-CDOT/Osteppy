@@ -4,7 +4,8 @@ import { promises as fs } from "fs";
 export default class EODList {
   constructor({
     dataFile = path.join(__dirname, "../config-files/eods.json"),
-    unsubmittedNamesFile = path.join(__dirname, "../config-files/sleepyRAs.txt")
+    unsubmittedNamesFile = path.join(__dirname, "../config-files/sleepyRAs.txt"),
+    EODReminderTimes = path.join(__dirname, "../config-files/EODReminderTimes.json")
   } = {}) {
     this.reportData = {};
     this.dataFile = dataFile;
@@ -50,5 +51,16 @@ export default class EODList {
 
   report() {
     return this.reportData;
+  }
+
+  //Adds or overwrites an EOD reminder
+  //Given: name, reminder formatted as TIME WEEKDAYS MESSAGE
+  add(name, reminder) {
+    if (this.EODReminderTimes[name] !== undefined){
+      console.log(name + " found.");
+    } else {
+      console.log(name + " not found.");
+    }
+    const reminders = this.EODReminderTimes[name];
   }
 }
