@@ -7,3 +7,5 @@
 *secret*
 /src/clock.txt
 *.env
+/config-files/*
+!/config-files/.gitkeep
