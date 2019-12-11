@@ -20,8 +20,8 @@ const { WebClient } = require('@slack/web-api'); //const { WebClient } = require
 const cpCommand = 'cp ' + path.join(__dirname, '../config-files/RAs.txt') + " " + path.join(__dirname, '../config-files/sleepyRAs.txt') //'cp ../config-files/RAs.txt ../config-files/sleepyRAs.txt';
 const slackToken = fs.readFileSync(path.resolve(__dirname, '../config-files/SLACK_TOKEN'), 'utf8');
 const web = new WebClient(slackToken);
-const channelIDs = require('../config-files/channelID.json');
-const eodReminders = require('../config-files/EODReminderTimes.json');
+const channelIDs = require(path.join(__dirname, '../config-files/channelID.json'));
+const eodReminders = require(path.join(__dirname, '../config-files/EODReminderTimes.json'));
 const sleepyRANames = fs.readFileSync(path.resolve(__dirname, '../config-files/sleepyRAs.txt')).toString().split('\n');
 
 const today = new Date();
@@ -46,7 +46,7 @@ const resetRAList = () => {
 
 // Sends the next successive EOD reminders
 const sendNextReminders = () => {
-  let nextReminderSeconds = 604800000000;
+  let nextReminderSeconds = 604800000;
   let nextReminderTime = [];
   let nextReminders = [];
   sleepyRANames.forEach((name) => {
@@ -88,6 +88,4 @@ const sendNextReminders = () => {
 }
 
 
-//sendNextReminders();
-console.log (cpCommand);
-resetRAList();
+sendNextReminders();
