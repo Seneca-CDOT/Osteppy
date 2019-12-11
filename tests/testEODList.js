@@ -65,10 +65,6 @@ var submitEOD  = (name, data) => {
 	sleepyRANames = sleepyRANames.filter(n => n!== name);
 	fs.writeFileSync(EODPath, JSON.stringify(EODs), 'utf8');
 	fs.writeFileSync(sleepyRAPath, sleepyRANames.join('\n') + "\n", 'utf8');
-	/*for (let i = 1; i < sleepyRANames.length; i++){
-		fs.appendFileSync(sleepyRAPath, sleepyRANames[i] + "\n", 'utf8');
-		console.log(sleepyRANames[i] + "\n");
-	}*/
 }
 
 var getSleepyRAs  = () => {
@@ -76,6 +72,7 @@ var getSleepyRAs  = () => {
 }
 
 exports.addEODReminder = addEODReminder;
+exports.viewEODReminders = viewEODReminders;
 exports.removeEODReminder = removeEODReminder;
 exports.submitEOD = submitEOD;
 exports.getSleepyRAs = getSleepyRAs;

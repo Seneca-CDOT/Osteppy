@@ -107,6 +107,35 @@ app.post('/add_eod_reminder', (req, res) => {
 	}
 });
 
+// Slash command for checking EOD reminders
+app.post('/check_eods', (req, res) => {
+	const slackRequest = req.body;
+  
+	const EODs = testEOD.viewEODReminders(slackRequest.user_name);
+	var message = "";
+
+	for (let i = 0; i < EODs.length; i++){
+		message += i + ": " + JSON.stringify(EODs[i]) + "\n";
+	}
+
+	const slackResponse = {
+	  response_type: 'in_channel',
+	  text: 'Your EODs:',
+	  attachments: [
+		{
+		  text: `${message}`,
+		},
+	  ],
+	};
+	axios
+	  .post(slackRequest.response_url, slackResponse)
+	  .catch((error) => {
+		console.log(`error: ${error}`);
+	  });
+  
+	res.status(200).send();
+});
+
 app.server.listen(8080 || config.port, () => { //process.env.PORT 
     console.log(`Started on port ${app.server.address().port}`);
 });
