@@ -19,8 +19,8 @@ EODJSON = JSON.parse(EODContent);
 
 // Saves an EOD reminder
 var addEODReminder = (name, message) => {
-    var messageArr = message.split(";")
-    var reminderJSON = JSON.parse('{ "time": ' + '"' + messageArr[0] 
+    var messageArr = message.split(";");
+    var reminderJSON = JSON.parse('{ "time": ' + '"' + messageArr[0]
     + '", ' + '"weekday": [' +  messageArr[1].split(",")
     + '], "message": ' +  messageArr[2] + "}");
     //console.log(reminderJSON)
@@ -32,7 +32,7 @@ var addEODReminder = (name, message) => {
         EODJSON[name] = {"reminders" : [reminderJSON]}
     }
     fs.writeFileSync(EODReminderPath, JSON.stringify(EODJSON), 'utf8');
-    return reminderJSON;
+    return JSON.stringify(reminderJSON);
 }
 
 // Returns EOD reminders in JSON format

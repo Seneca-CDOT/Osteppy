@@ -39,7 +39,6 @@ app.post('/eod', (req, res) => {
 		},
 	],
 	};
-
 	axios
 	.post(slackRequest.response_url, slackResponse)
 	.then(() => testEOD.submitEOD(slackRequest.user_name, {
@@ -64,7 +63,6 @@ app.post('/eod_left', (req, res) => {
 		},
 	  ],
 	};
-  
 	axios
 	  .post(slackRequest.response_url, slackResponse)
 	  .catch((error) => {
@@ -72,7 +70,42 @@ app.post('/eod_left', (req, res) => {
 	  });
   
 	res.status(200).send();
-  });
+});
+
+// Slash command for adding an EOD
+app.post('/add_eod_reminder', (req, res) => {
+	const slackRequest = req.body;
+	
+	if (slackRequest.text.split(";").length == 3){
+		const message = testEOD.addEODReminder(slackRequest.user_name,slackRequest.text);
+		const slackResponse = {
+		response_type: 'in_channel',
+		text: `EOD added:`,
+		attachments: [
+			{
+			text: `${message}`,
+			},
+		],
+		};
+		axios
+		.post(slackRequest.response_url, slackResponse)
+		res.status(200).send();
+	} else {
+		//console.log("add_eod_reminder failed: " + slackRequest.text.split(";").length)
+		const slackResponse = {
+		response_type: 'in_channel',
+		text: `ERROR: Wrong syntax used. Correct syntax: time;weekdays;"message"`,
+		attachments: [
+			{
+			text: `Eg. 17:00;1,2,3,4,5;"It's 5PM, remember to submit EOD! :robot_face:"\n Your message: ${slackRequest.text}`,
+			},
+		],
+		};
+		axios
+		.post(slackRequest.response_url, slackResponse)
+		res.status(200).send();
+	}
+});
 
 app.server.listen(8080 || config.port, () => { //process.env.PORT 
     console.log(`Started on port ${app.server.address().port}`);
