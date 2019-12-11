@@ -3,6 +3,10 @@
 const path = require("path");
 const fs = require("fs");
 const EODReminderPath = path.join(__dirname, "../config-files/EODReminderTimes.json");
+const sleepyRAPath = path.join(__dirname, '../config-files/sleepyRAs.txt');
+var sleepyRANames = fs.readFileSync(sleepyRAPath).toString().split('\n');
+const EODPath = path.join(__dirname, "../config-files/eods.json");
+var EODs = JSON.parse(fs.readFileSync(EODPath));
 
 var EODJSON;
 
@@ -56,8 +60,24 @@ var removeEODReminder = (name, number) => { //module.exports.
     }
 }
 
+var submitEOD  = (name, data) => {
+	EODs[name] = data;
+	console.log("Before:" + sleepyRANames);
+	sleepyRANames = sleepyRANames.filter(n => n!== name);
+	fs.writeFileSync(EODPath, JSON.stringify(EODs), 'utf8');
+	console.log("After:" + sleepyRANames);
+	console.log(sleepyRANames);
+	console.log(sleepyRANames[0] + "\n")
+	fs.writeFileSync(sleepyRAPath, sleepyRANames[0] + "\n", 'utf8');
+	for (let i = 1; i < sleepyRANames.length; i++){
+		fs.appendFileSync(sleepyRAPath, sleepyRANames[i] + "\n", 'utf8');
+		console.log(sleepyRANames[i] + "\n");
+	}
+}
+
 exports.addEODReminder = addEODReminder;
 exports.removeEODReminder = removeEODReminder;
+exports.submitEOD = submitEOD;
 
 //addEODReminder("naiuhz", "17:00;1,2,3,4,5;\"It's 5PM, remember to submit EOD! :ayaya:\"");
 //addEODReminder("Jason", "10:00;1,2,3,4,5;\"It's 10AM, remember to submit yesterday's EOD! :ayaya:\"");
