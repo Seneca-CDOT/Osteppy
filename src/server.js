@@ -13,10 +13,7 @@ const path = require('path');
 const fs = require('fs');
 //const EODList = require('./EODList');
 const bodyParser = require('body-parser');
-const testEOD = require('./testEODList');
-const EODReminder = require('./EODReminder');
-
-//const EOD = new EODList();
+const EOD = require('./EODList');
 
 const app = express();
 
@@ -41,7 +38,7 @@ app.post('/eod', (req, res) => {
 	};
 	axios
 	.post(slackRequest.response_url, slackResponse)
-	.then(() => testEOD.submitEOD(slackRequest.user_name, {
+	.then(() => EOD.submitEOD(slackRequest.user_name, {
 		time: new Date(),
 		text: slackRequest.text,
 		channel: slackRequest.channel_name,
@@ -53,7 +50,7 @@ app.post('/eod', (req, res) => {
 app.post('/eod_left', (req, res) => {
 	const slackRequest = req.body;
   
-	const message = testEOD.getSleepyRAs().join('\n');
+	const message = EOD.getSleepyRAs().join('\n');
 	const slackResponse = {
 	  response_type: 'in_channel',
 	  text: 'Sleepy RAs who haven\'t submitted their EODs:',
@@ -77,7 +74,7 @@ app.post('/add_eod_reminder', (req, res) => {
 	const slackRequest = req.body;
 	
 	if (slackRequest.text.split(";").length == 3){
-		const message = testEOD.addEODReminder(slackRequest.user_name,slackRequest.text);
+		const message = EOD.addEODReminder(slackRequest.user_name,slackRequest.text);
 		const slackResponse = {
 		response_type: 'in_channel',
 		text: `EOD added:`,
@@ -111,7 +108,7 @@ app.post('/add_eod_reminder', (req, res) => {
 app.post('/check_eods', (req, res) => {
 	const slackRequest = req.body;
   
-	const EODs = testEOD.viewEODReminders(slackRequest.user_name);
+	const EODs = EOD.viewEODReminders(slackRequest.user_name);
 	var message = "";
 
 	for (let i = 0; i < EODs.length; i++){
@@ -139,10 +136,10 @@ app.post('/check_eods', (req, res) => {
 // Slash command for removing an EOD
 app.post('/remove_eod_reminder', (req, res) => {
 	const slackRequest = req.body;
-	const numEODs = testEOD.getNumEODs(slackRequest.user_name);
+	const numEODs = EOD.getNumEODs(slackRequest.user_name);
 	const removeIndex = parseInt(slackRequest.text);
 	if (numEODs > 0 && !isNaN(removeIndex) && removeIndex < numEODs){
-		const message = testEOD.removeEODReminder(slackRequest.user_name, slackRequest.text);
+		const message = EOD.removeEODReminder(slackRequest.user_name, slackRequest.text);
 		const slackResponse = {
 		response_type: 'in_channel',
 		text: `EOD removed:`,
@@ -177,9 +174,6 @@ app.server.listen(8080 || config.port, () => { //process.env.PORT
     console.log(`Started on port ${app.server.address().port}`);
 });
 
-//EODReminder.resetRAList();
 
-//console.log(JSON.stringify(testEOD.addEODReminder("naiuhz", "17:00;1,2,3,4,5;\"It's 5PM, remember to submit EOD! :ayaya:\"")));
-
-
-//export default app;
+//Tests
+//console.log(JSON.stringify(EOD.addEODReminder("naiuhz", "17:00;1,2,3,4,5;\"It's 5PM, remember to submit EOD! :ayaya:\"")));
