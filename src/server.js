@@ -1,177 +1,179 @@
 #!/usr/bin/env node
 
-/** ********************************************************
-// OSTEP Dashboard Osteppy API
-// server.cpp
-// Date Created: 2018/09/11
-// Author: Olga Belavina and Yiran Zhu
-// Email: yzhu132@myseneca.ca
-// Description: Slack API triggered by and responds to
-// slash commands such as /eod and /eod_left.
-********************************************************* */
+//import axios from 'axios';
+//import express from 'express';
+//import http from 'http';
+//import EODList from './EODList';
+//import bodyParser from 'body-parser';
 
-import cp from 'child_process';
-import http from 'http';
-import path from 'path';
-import express from 'express';
-import cors from 'cors';
-import morgan from 'morgan';
-import bodyParser from 'body-parser';
-import axios from 'axios';
-import fs from 'fs';
-
-import EODList from './EODList';
-
-import config from './config.json';
-
-const clockPath = path.join(__dirname, 'clock.txt');
-
-const EOD = new EODList();
-
-// Checks if EOD reminder JavaScript is running or not
-function checkJSScript() {
-  const message = cp.execSync('ps aux | grep EODreminder.js');
-  return message;
-}
-
-// Reads clock.txt to return the time
-function checkEODClock() {
-  if (fs.existsSync(clockPath)) {
-    const contents = fs.readFileSync(clockPath, 'utf8');
-    return (contents);
-  }
-  return ('Error: Clock does not exist!');
-}
-
-cp.fork(`${__dirname}/EODreminder.js`);
+const axios = require("axios");
+const express = require('express');
+const http = require('http');
+const path = require('path');
+const fs = require('fs');
+//const EODList = require('./EODList');
+const bodyParser = require('body-parser');
+const EOD = require('./EODList');
 
 const app = express();
 
 app.server = http.createServer(app);
 
-// logger
-app.use(morgan('dev'));
-
-// 3rd party middleware
-app.use(cors({
-  exposedHeaders: config.corsHeaders,
-}));
-
 app.use(bodyParser.urlencoded({
-  extended: true,
-}));
-
-/** Reached by Slack API */
+    extended: true,
+  }));
 
 // Slash command for submitting EOD's
 app.post('/eod', (req, res) => {
-  const slackRequest = req.body;
+	const slackRequest = req.body;
 
-  const slackResponse = {
-    response_type: 'in_channel',
-    text: `:checkered_flag: EOD was submitted by *${slackRequest.user_name}*`,
-    attachments: [
-      {
-        text: `${slackRequest.text}`,
-      },
-    ],
-  };
-
-  axios
-    .post(slackRequest.response_url, slackResponse)
-    .then(() => EOD.submit(slackRequest.user_name, {
-      time: new Date(),
-      text: slackRequest.text,
-      channel: slackRequest.channel_name,
-    })).catch((error) => {
-      console.log(`error: ${error}`);
-    });
-
-  res.status(200).send();
+	const slackResponse = {
+	response_type: 'in_channel',
+	text: `:checkered_flag: EOD was submitted by *${slackRequest.user_name}*`,
+	attachments: [
+		{
+		text: `${slackRequest.text}`,
+		},
+	],
+	};
+	axios
+	.post(slackRequest.response_url, slackResponse)
+	.then(() => EOD.submitEOD(slackRequest.user_name, {
+		time: new Date(),
+		text: slackRequest.text,
+		channel: slackRequest.channel_name,
+	}))
+	res.status(200).send();
 });
 
 // Slash command for checking who have yet to submit EOD's
 app.post('/eod_left', (req, res) => {
-  const slackRequest = req.body;
-
-  const message = EOD.missing().join('\n');
-
-  const slackResponse = {
-    response_type: 'in_channel',
-    text: 'Sleepy RAs who haven\'t submitted their EODs:',
-    attachments: [
-      {
-        text: `${message}`,
-      },
-    ],
-  };
-
-  axios
-    .post(slackRequest.response_url, slackResponse)
-    .catch((error) => {
-      console.log(`error: ${error}`);
-    });
-
-  res.status(200).send();
+	const slackRequest = req.body;
+  
+	const message = EOD.getSleepyRAs().join('\n');
+	const slackResponse = {
+	  response_type: 'in_channel',
+	  text: 'Sleepy RAs who haven\'t submitted their EODs:',
+	  attachments: [
+		{
+		  text: `${message}`,
+		},
+	  ],
+	};
+	axios
+	  .post(slackRequest.response_url, slackResponse)
+	  .catch((error) => {
+		console.log(`error: ${error}`);
+	  });
+  
+	res.status(200).send();
 });
 
-// Slash command for checking if remindEOD.js script is still running or not
-app.post('/check_js_script', (req, res) => {
-  const slackRequest = req.body;
-  const message = checkJSScript();
-
-  const slackResponse = {
-    response_type: 'in_channel',
-    text: 'ps aux | grep EODreminder.js:',
-    attachments: [
-      {
-        text: `${message}`, // py_script
-      },
-    ],
-  };
-
-  axios
-    .post(slackRequest.response_url, slackResponse)
-    .catch((error) => {
-      console.log(`error: ${error}`);
-    });
-
-  res.status(200).send();
+// Slash command for adding an EOD
+app.post('/add_eod_reminder', (req, res) => {
+	const slackRequest = req.body;
+	
+	if (slackRequest.text.split(";").length == 3){
+		const message = EOD.addEODReminder(slackRequest.user_name,slackRequest.text);
+		const slackResponse = {
+		response_type: 'in_channel',
+		text: `EOD added:`,
+		attachments: [
+			{
+			text: `${message}`,
+			},
+		],
+		};
+		axios
+		.post(slackRequest.response_url, slackResponse)
+		res.status(200).send();
+	} else {
+		//console.log("add_eod_reminder failed: " + slackRequest.text.split(";").length)
+		const slackResponse = {
+		response_type: 'in_channel',
+		text: `ERROR: Wrong syntax used. Correct syntax: time;weekdays;"message"`,
+		attachments: [
+			{
+			text: `Eg. 17:00;1,2,3,4,5;"It's 5PM, remember to submit EOD! :robot_face:"\n Your message: ${slackRequest.text}`,
+			},
+		],
+		};
+		axios
+		.post(slackRequest.response_url, slackResponse)
+		res.status(200).send();
+	}
 });
 
-// Slash command for checking remindEOD.py's time
-app.post('/check_eod_time', (req, res) => {
-  const slackRequest = req.body;
+// Slash command for checking EOD reminders
+app.post('/check_eods', (req, res) => {
+	const slackRequest = req.body;
+  
+	const EODs = EOD.viewEODReminders(slackRequest.user_name);
+	var message = "";
 
-  const time = checkEODClock();
+	for (let i = 0; i < EODs.length; i++){
+		message += i + ": " + JSON.stringify(EODs[i]) + "\n";
+	}
 
-  const slackResponse = {
-    response_type: 'in_channel',
-    text: 'EOD Reminder Bot\'s clock:',
-    attachments: [
-      {
-        text: `${time}`,
-      },
-    ],
-  };
-
-  axios
-    .post(slackRequest.response_url, slackResponse)
-    .catch((error) => {
-      console.log(`error: ${error}`);
-    });
-
-  res.status(200).send();
+	const slackResponse = {
+	  response_type: 'in_channel',
+	  text: 'Your EODs:',
+	  attachments: [
+		{
+		  text: `${message}`,
+		},
+	  ],
+	};
+	axios
+	  .post(slackRequest.response_url, slackResponse)
+	  .catch((error) => {
+		console.log(`error: ${error}`);
+	  });
+  
+	res.status(200).send();
 });
 
-/** Get EODs */
-app.get('/eod', (req, res) => {
-  res.json(EOD.report());
+// Slash command for removing an EOD
+app.post('/remove_eod_reminder', (req, res) => {
+	const slackRequest = req.body;
+	const numEODs = EOD.getNumEODs(slackRequest.user_name);
+	const removeIndex = parseInt(slackRequest.text);
+	if (numEODs > 0 && !isNaN(removeIndex) && removeIndex < numEODs){
+		const message = EOD.removeEODReminder(slackRequest.user_name, slackRequest.text);
+		const slackResponse = {
+		response_type: 'in_channel',
+		text: `EOD removed:`,
+		attachments: [
+			{
+			text: `${message}`,
+			},
+		],
+		};
+		axios
+		.post(slackRequest.response_url, slackResponse)
+		res.status(200).send();
+	} else {
+		var message = "";
+		if (numEODs == 0) {
+			message =  "Sorry " + slackRequest.user_name + ", but you have no EOD Reminders to remove."
+		} else {
+			message = "Sorry " + slackRequest.user_name + ", but you only have " + numEODs + " EOD Reminders and your index: " + slackRequest.text + " is out of bounds or invalid.";
+
+		}
+		const slackResponse = {
+			response_type: 'in_channel',
+			text: message
+			};
+			axios
+			.post(slackRequest.response_url, slackResponse)
+			res.status(200).send();
+	}
 });
 
 app.server.listen(8080 || config.port, () => { //process.env.PORT 
-  console.log(`Started on port ${app.server.address().port}`);
-  EOD.load().catch(console.log);
+    console.log(`Started on port ${app.server.address().port}`);
 });
 
-export default app;
+
+//Tests
+//console.log(JSON.stringify(EOD.addEODReminder("naiuhz", "17:00;1,2,3,4,5;\"It's 5PM, remember to submit EOD! :ayaya:\"")));
