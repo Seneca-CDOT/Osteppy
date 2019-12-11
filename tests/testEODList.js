@@ -55,11 +55,14 @@ var removeEODReminder = (name, number) => { //module.exports.
     }
 }
 
+exports.addEODReminder = addEODReminder;
+exports.removeEODReminder = removeEODReminder;
+
 //addEODReminder("naiuhz", "17:00;1,2,3,4,5;\"It's 5PM, remember to submit EOD! :ayaya:\"");
 //addEODReminder("Jason", "10:00;1,2,3,4,5;\"It's 10AM, remember to submit yesterday's EOD! :ayaya:\"");
 
 //console.log(viewEODReminders("naiuhz"));
-console.log(removeEODReminder("naiuhz", 2));
+//console.log(removeEODReminder("naiuhz", 2));
 
 //console.log(EODJSON["naiuhz"]["reminders"]);
 //console.log(EODJSON["Jason"]["reminders"]);
