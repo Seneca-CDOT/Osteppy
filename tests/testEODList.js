@@ -28,7 +28,7 @@ var addEODReminder = (name, message) => {
         //console.log(EODJSON[name]["reminders"]);
         EODJSON[name]["reminders"].push(reminderJSON)
     } else {
-        console.log(name + " not found.");
+        //console.log(name + " not found.");
         EODJSON[name] = {"reminders" : [reminderJSON]}
     }
     fs.writeFileSync(EODReminderPath, JSON.stringify(EODJSON), 'utf8');
@@ -62,22 +62,23 @@ var removeEODReminder = (name, number) => { //module.exports.
 
 var submitEOD  = (name, data) => {
 	EODs[name] = data;
-	console.log("Before:" + sleepyRANames);
 	sleepyRANames = sleepyRANames.filter(n => n!== name);
 	fs.writeFileSync(EODPath, JSON.stringify(EODs), 'utf8');
-	console.log("After:" + sleepyRANames);
-	console.log(sleepyRANames);
-	console.log(sleepyRANames[0] + "\n")
-	fs.writeFileSync(sleepyRAPath, sleepyRANames[0] + "\n", 'utf8');
-	for (let i = 1; i < sleepyRANames.length; i++){
+	fs.writeFileSync(sleepyRAPath, sleepyRANames.join('\n') + "\n", 'utf8');
+	/*for (let i = 1; i < sleepyRANames.length; i++){
 		fs.appendFileSync(sleepyRAPath, sleepyRANames[i] + "\n", 'utf8');
 		console.log(sleepyRANames[i] + "\n");
-	}
+	}*/
+}
+
+var getSleepyRAs  = () => {
+    return sleepyRANames;
 }
 
 exports.addEODReminder = addEODReminder;
 exports.removeEODReminder = removeEODReminder;
 exports.submitEOD = submitEOD;
+exports.getSleepyRAs = getSleepyRAs;
 
 //addEODReminder("naiuhz", "17:00;1,2,3,4,5;\"It's 5PM, remember to submit EOD! :ayaya:\"");
 //addEODReminder("Jason", "10:00;1,2,3,4,5;\"It's 10AM, remember to submit yesterday's EOD! :ayaya:\"");

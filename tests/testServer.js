@@ -26,10 +26,9 @@ app.use(bodyParser.urlencoded({
     extended: true,
   }));
 
+// Slash command for submitting EOD's
 app.post('/eod', (req, res) => {
 	const slackRequest = req.body;
-
-	console.log(slackRequest.text);
 
 	const slackResponse = {
 	response_type: 'in_channel',
@@ -43,21 +42,37 @@ app.post('/eod', (req, res) => {
 
 	axios
 	.post(slackRequest.response_url, slackResponse)
-	/*.then(() => EOD.submit(slackRequest.user_name, {
-		time: new Date(),
-		text: slackRequest.text,
-		channel: slackRequest.channel_name,
-	})).catch((error) => {
-		console.log(`error: ${error}`);
-	});*/
 	.then(() => testEOD.submitEOD(slackRequest.user_name, {
 		time: new Date(),
 		text: slackRequest.text,
 		channel: slackRequest.channel_name,
 	}))
-
 	res.status(200).send();
 });
+
+// Slash command for checking who have yet to submit EOD's
+app.post('/eod_left', (req, res) => {
+	const slackRequest = req.body;
+  
+	const message = testEOD.getSleepyRAs().join('\n');
+	const slackResponse = {
+	  response_type: 'in_channel',
+	  text: 'Sleepy RAs who haven\'t submitted their EODs:',
+	  attachments: [
+		{
+		  text: `${message}`,
+		},
+	  ],
+	};
+  
+	axios
+	  .post(slackRequest.response_url, slackResponse)
+	  .catch((error) => {
+		console.log(`error: ${error}`);
+	  });
+  
+	res.status(200).send();
+  });
 
 app.server.listen(8080 || config.port, () => { //process.env.PORT 
     console.log(`Started on port ${app.server.address().port}`);
