@@ -40,7 +40,7 @@ module.exports.sendDM = (RA, message) => {
 };
 
 // Resets RA list in the morning of a weekday
-const resetRAList = () => {
+module.exports.resetRAList = () => {
   execSync(cpCommand);
 };
 
