@@ -136,6 +136,43 @@ app.post('/check_eods', (req, res) => {
 	res.status(200).send();
 });
 
+// Slash command for removing an EOD
+app.post('/remove_eod_reminder', (req, res) => {
+	const slackRequest = req.body;
+	const numEODs = testEOD.getNumEODs(slackRequest.user_name);
+	const removeIndex = parseInt(slackRequest.text);
+	if (numEODs > 0 && !isNaN(removeIndex) && removeIndex < numEODs){
+		const message = testEOD.removeEODReminder(slackRequest.user_name, slackRequest.text);
+		const slackResponse = {
+		response_type: 'in_channel',
+		text: `EOD removed:`,
+		attachments: [
+			{
+			text: `${message}`,
+			},
+		],
+		};
+		axios
+		.post(slackRequest.response_url, slackResponse)
+		res.status(200).send();
+	} else {
+		var message = "";
+		if (numEODs == 0) {
+			message =  "Sorry " + slackRequest.user_name + ", but you have no EOD Reminders to remove."
+		} else {
+			message = "Sorry " + slackRequest.user_name + ", but you only have " + numEODs + " EOD Reminders and your index: " + slackRequest.text + " is out of bounds or invalid.";
+
+		}
+		const slackResponse = {
+			response_type: 'in_channel',
+			text: message
+			};
+			axios
+			.post(slackRequest.response_url, slackResponse)
+			res.status(200).send();
+	}
+});
+
 app.server.listen(8080 || config.port, () => { //process.env.PORT 
     console.log(`Started on port ${app.server.address().port}`);
 });

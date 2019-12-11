@@ -44,19 +44,19 @@ var viewEODReminders = (name) => {
     }
 }
 
+var getNumEODs = (name) => {
+    if (EODJSON[name] !== undefined) {
+        return EODJSON[name]["reminders"].length;
+    }
+    return 0;
+}
+
 // Removes an EOD reminder
 var removeEODReminder = (name, number) => { //module.exports.
     if (EODJSON[name] !== undefined){
-        let reminders = EODJSON[name]["reminders"].length;
-        if (number < reminders){
-            var removedReminder = EODJSON[name]["reminders"].splice(number, 1);
-            fs.writeFileSync(EODReminderPath, JSON.stringify(EODJSON), 'utf8');
-            return removedReminder;
-        } else {
-            return ("Sorry " + name + ", but you only have " + reminders + " EOD Reminders and your number " + number + " is out of bounds.");
-        }
-    } else {
-        return ("Sorry " + name + ", but you have no EOD Reminders to remove.");
+        var removedReminder = EODJSON[name]["reminders"].splice(number, 1);
+        fs.writeFileSync(EODReminderPath, JSON.stringify(EODJSON), 'utf8');
+        return JSON.stringify(removedReminder[0]);
     }
 }
 
@@ -73,9 +73,11 @@ var getSleepyRAs  = () => {
 
 exports.addEODReminder = addEODReminder;
 exports.viewEODReminders = viewEODReminders;
+exports.getNumEODs = getNumEODs;
 exports.removeEODReminder = removeEODReminder;
 exports.submitEOD = submitEOD;
 exports.getSleepyRAs = getSleepyRAs;
+
 
 //addEODReminder("naiuhz", "17:00;1,2,3,4,5;\"It's 5PM, remember to submit EOD! :ayaya:\"");
 //addEODReminder("Jason", "10:00;1,2,3,4,5;\"It's 10AM, remember to submit yesterday's EOD! :ayaya:\"");
