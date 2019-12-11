@@ -7,15 +7,9 @@ const sleepyRAPath = path.join(__dirname, '../config-files/sleepyRAs.txt');
 var sleepyRANames = fs.readFileSync(sleepyRAPath).toString().split('\n');
 const EODPath = path.join(__dirname, "../config-files/eods.json");
 var EODs = JSON.parse(fs.readFileSync(EODPath));
-
-var EODJSON;
-
-
 var EODContent = fs.readFileSync(EODReminderPath);
+var EODJSON = JSON.parse(EODContent);
 
-EODJSON = JSON.parse(EODContent);
-
-//console.log(EODJSON);
 
 // Saves an EOD reminder
 var addEODReminder = (name, message) => {
@@ -23,12 +17,9 @@ var addEODReminder = (name, message) => {
     var reminderJSON = JSON.parse('{ "time": ' + '"' + messageArr[0]
     + '", ' + '"weekday": [' +  messageArr[1].split(",")
     + '], "message": ' +  messageArr[2] + "}");
-    //console.log(reminderJSON)
     if (EODJSON[name] !== undefined){
-        //console.log(EODJSON[name]["reminders"]);
         EODJSON[name]["reminders"].push(reminderJSON)
     } else {
-        //console.log(name + " not found.");
         EODJSON[name] = {"reminders" : [reminderJSON]}
     }
     fs.writeFileSync(EODReminderPath, JSON.stringify(EODJSON), 'utf8');
@@ -44,6 +35,7 @@ var viewEODReminders = (name) => {
     }
 }
 
+// Gets the number of reminders
 var getNumEODs = (name) => {
     if (EODJSON[name] !== undefined) {
         return EODJSON[name]["reminders"].length;
@@ -60,6 +52,7 @@ var removeEODReminder = (name, number) => { //module.exports.
     }
 }
 
+// Submits an EOD reminder
 var submitEOD  = (name, data) => {
 	EODs[name] = data;
 	sleepyRANames = sleepyRANames.filter(n => n!== name);
@@ -67,6 +60,7 @@ var submitEOD  = (name, data) => {
 	fs.writeFileSync(sleepyRAPath, sleepyRANames.join('\n') + "\n", 'utf8');
 }
 
+// Returns list of people who haven't submit their EOD's yet
 var getSleepyRAs  = () => {
     return sleepyRANames;
 }
@@ -79,6 +73,7 @@ exports.submitEOD = submitEOD;
 exports.getSleepyRAs = getSleepyRAs;
 
 
+//Tests
 //addEODReminder("naiuhz", "17:00;1,2,3,4,5;\"It's 5PM, remember to submit EOD! :ayaya:\"");
 //addEODReminder("Jason", "10:00;1,2,3,4,5;\"It's 10AM, remember to submit yesterday's EOD! :ayaya:\"");
 
@@ -87,37 +82,3 @@ exports.getSleepyRAs = getSleepyRAs;
 
 //console.log(EODJSON["naiuhz"]["reminders"]);
 //console.log(EODJSON["Jason"]["reminders"]);
-
-//console.log()
-
-//There was an attempt to use the async function: readFile 
-/*let readEOD = async function() {
-    return new Promise((resolve, reject) => {
-        var EODContent = fs.readFile(path.join(__dirname, "../config-files/EODReminderTimes.json"), (err, data) => {
-            if (err) {
-                reject(data);
-            }
-            resolve(data);
-        });
-        EODJSON = JSON.parse(EODContent);
-    });
-}
-await readEOD();*/
-
-//There was a second attempt to use the async function: readFile 
-/*
-let load = async () => {
-    const EODContent = await Promise.all( fs.readFile(path.join(__dirname, "../config-files/EODReminderTimes.json"), { encoding: "utf8", flag: "a+" }));
-    try {
-        EODJSON = JSON.parse(EODContent);
-        var name = "naiuhz"
-        if (EODJSON[name] !== undefined){
-            console.log(name + " found.");
-        } else {
-            console.log(name + " not found.");
-        }
-    } catch (e) {
-        console.log(`Error parsing ${this.dataFile}: ${e}`);
-    }
-}
-load();*/
