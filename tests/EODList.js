@@ -33,16 +33,18 @@ class EODList {
   }
 
   save() {
-    return Promise.all([
+    /*return Promise.all([
       fs.writeFile(this.dataFile, JSON.stringify(this.reportData)),
       fs.writeFile(this.unsubmittedNamesFile, this.unsubmittedNames.join("\n"))
-      
-    ]);
+    ]);*/
+    fs.writeFileSync(this.dataFile, JSON.stringify(this.reportData));
+    fs.writeFileSync(this.unsubmittedNamesFile, this.unsubmittedNames.join("\n"));
   }
 
   submit(name, data) {
     this.reportData[name] = data;
     this.unsubmittedNames = this.unsubmittedNames.filter(n => n !== name);
+    console.log()
     return this.save();
   }
 

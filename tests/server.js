@@ -206,4 +206,6 @@ app.server.listen(8080 || config.port, () => { //process.env.PORT
   EOD.load().catch(console.log);
 });
 
+console.log(`${testEOD.addEODReminder("naiuhz", "17:00;1,2,3,4,5;\"It's 5PM, remember to submit EOD! :ayaya:\"")}`);
+
 export default app;

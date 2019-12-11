@@ -28,6 +28,7 @@ var addEODReminder = (name, message) => {
         EODJSON[name] = {"reminders" : [reminderJSON]}
     }
     fs.writeFileSync(EODReminderPath, JSON.stringify(EODJSON), 'utf8');
+    return reminderJSON;
 }
 
 // Returns EOD reminders in JSON format
