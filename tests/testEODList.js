@@ -40,14 +40,26 @@ var viewEODReminders = (name) => {
 }
 
 // Removes an EOD reminder
-var removeEODReminder = (name, number) => {
-
+var removeEODReminder = (name, number) => { //module.exports.
+    if (EODJSON[name] !== undefined){
+        let reminders = EODJSON[name]["reminders"].length;
+        if (number < reminders){
+            var removedReminder = EODJSON[name]["reminders"].splice(number, 1);
+            fs.writeFileSync(EODReminderPath, JSON.stringify(EODJSON), 'utf8');
+            return removedReminder;
+        } else {
+            return ("Sorry " + name + ", but you only have " + reminders + " EOD Reminders and your number " + number + " is out of bounds.");
+        }
+    } else {
+        return ("Sorry " + name + ", but you have no EOD Reminders to remove.");
+    }
 }
 
 //addEODReminder("naiuhz", "17:00;1,2,3,4,5;\"It's 5PM, remember to submit EOD! :ayaya:\"");
 //addEODReminder("Jason", "10:00;1,2,3,4,5;\"It's 10AM, remember to submit yesterday's EOD! :ayaya:\"");
 
-console.log(viewEODReminders("naiuhz"));
+//console.log(viewEODReminders("naiuhz"));
+console.log(removeEODReminder("naiuhz", 2));
 
 //console.log(EODJSON["naiuhz"]["reminders"]);
 //console.log(EODJSON["Jason"]["reminders"]);
