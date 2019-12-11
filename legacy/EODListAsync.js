@@ -74,3 +74,38 @@ class EODList {
 }
 
 module.exports = EODList;
+
+
+//console.log()
+
+//There was an attempt to use the async function: readFile 
+/*let readEOD = async function() {
+    return new Promise((resolve, reject) => {
+        var EODContent = fs.readFile(path.join(__dirname, "../config-files/EODReminderTimes.json"), (err, data) => {
+            if (err) {
+                reject(data);
+            }
+            resolve(data);
+        });
+        EODJSON = JSON.parse(EODContent);
+    });
+}
+await readEOD();*/
+
+//There was a second attempt to use the async function: readFile 
+/*
+let load = async () => {
+    const EODContent = await Promise.all( fs.readFile(path.join(__dirname, "../config-files/EODReminderTimes.json"), { encoding: "utf8", flag: "a+" }));
+    try {
+        EODJSON = JSON.parse(EODContent);
+        var name = "naiuhz"
+        if (EODJSON[name] !== undefined){
+            console.log(name + " found.");
+        } else {
+            console.log(name + " not found.");
+        }
+    } catch (e) {
+        console.log(`Error parsing ${this.dataFile}: ${e}`);
+    }
+}
+load();*/
