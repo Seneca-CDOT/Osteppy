@@ -15,3 +15,6 @@ systemctl enable eod-reminder
 
 # Start Services
 systemctl start eod-reminder
+
+# Check Osteppy Service Status
+systemctl status eod-reminder
