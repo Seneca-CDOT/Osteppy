@@ -2,7 +2,7 @@
 
 # Server setup script for SystemD Services
 NEWDIR=$(dirname "$(readlink -fm "$0")")
-sed -i "s@OLDDIR@$NEWDIR@g" $NEWDIR/eod-reminder.service
+sed -i "s@OLDDIR@$NEWDIR@g" $NEWDIR/osteppy.service
 
 # Copy Unit Files
 
