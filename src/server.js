@@ -47,7 +47,7 @@ app.post('/eod', (req, res) => {
 });
 
 // Slash command for checking who have yet to submit EOD's
-app.post('/eod_left', (req, res) => {
+app.post('/eods_left', (req, res) => {
 	const slackRequest = req.body;
   
 	const message = EOD.getSleepyRAs().join('\n');
