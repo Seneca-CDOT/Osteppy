@@ -5,7 +5,7 @@ Description=Osteppy EOD reminder service
 Type=idle
 Restart=always
 RestartSec=3
-ExecStart=/usr/bin/node /home/ianzhu/Documents/Osteppy/src/server.js
+ExecStart=/usr/bin/node OLDDIR/Osteppy/src/server.js
 
 [Install]
 WantedBy=multi-user.target
