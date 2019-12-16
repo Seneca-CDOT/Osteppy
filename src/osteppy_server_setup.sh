@@ -16,3 +16,6 @@ systemctl enable osteppy
 
 # Start Services
 systemctl start osteppy
+
+# Check Osteppy Service Status
+systemctl status osteppy
