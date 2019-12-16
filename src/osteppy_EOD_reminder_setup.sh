@@ -18,3 +18,6 @@ systemctl start eod-reminder
 
 # Check Osteppy Service Status
 systemctl status eod-reminder
+
+# Check Osteppy Service Status
+systemctl restart eod-reminder
