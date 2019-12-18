@@ -47,7 +47,7 @@ app.post('/eod', (req, res) => {
 });
 
 // Slash command for checking who have yet to submit EOD's
-app.post('/eod_left', (req, res) => {
+app.post('/eods_left', (req, res) => {
 	const slackRequest = req.body;
   
 	const message = EOD.getSleepyRAs().join('\n');
@@ -105,7 +105,7 @@ app.post('/add_eod_reminder', (req, res) => {
 });
 
 // Slash command for checking EOD reminders
-app.post('/check_eods', (req, res) => {
+app.post('/check_eod_reminders', (req, res) => {
 	const slackRequest = req.body;
   
 	const EODs = EOD.viewEODReminders(slackRequest.user_name);
