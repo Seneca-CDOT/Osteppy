@@ -34,18 +34,10 @@ const sendEODs = (reminders) => {
   }
 }
 
-// Exported function used in slash command
-module.exports.sendDM = (RA, message) => {
-  web.chat.postMessage({ channel: channelIDs[RA], text: message });
-};
-
-// Resets RA list in the morning of a weekday
-module.exports.resetRAList = () => {
-  execSync(cpCommand);
-};
 
 // Sends the next successive EOD reminders
 const sendNextReminders = () => {
+
   let nextReminderSeconds = 604800000;
   let nextReminderTime = [];
   let nextReminders = [];
