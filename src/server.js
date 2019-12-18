@@ -14,6 +14,7 @@ const fs = require('fs');
 //const EODList = require('./EODList');
 const bodyParser = require('body-parser');
 const EOD = require('./EODList');
+const today = new Date();
 
 const app = express();
 
@@ -29,7 +30,7 @@ app.post('/eod', (req, res) => {
 
 	const slackResponse = {
 	response_type: 'in_channel',
-	text: `:checkered_flag: EOD was submitted by *${slackRequest.user_name}*`,
+	text: `:checkered_flag: EOD was submitted by *${slackRequest.user_name}* on ${today.getFullYear()}/${today.getMonth()+1}/${today.getDate()}`,
 	attachments: [
 		{
 		text: `${slackRequest.text}`,
@@ -173,6 +174,7 @@ app.post('/remove_eod_reminder', (req, res) => {
 app.server.listen(8080 || config.port, () => { //process.env.PORT 
     console.log(`Started on port ${app.server.address().port}`);
 });
+
 
 
 //Tests
