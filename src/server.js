@@ -170,6 +170,43 @@ app.post('/remove_eod_reminder', (req, res) => {
 	}
 });
 
+// Slash command for adding an EOD
+app.post('/set_vacation', (req, res) => {
+	
+	const slackRequest = req.body;
+	if (slackRequest.text.indexOf("remove") != -1){
+		//Add vacation day(s)
+		const message = EOD.setVactionDates(slackRequest.user_name,slackRequest.text);
+		const slackResponse = {
+		response_type: 'in_channel',
+		text: `Vacation date(s) added:`,
+		attachments: [
+			{
+			text: `${message}`,
+			},
+		],
+		};
+		axios
+		.post(slackRequest.response_url, slackResponse)
+		res.status(200).send();
+	} else {
+		//Remove vacation date(s)
+		const message = EOD.setVactionDates(slackRequest.user_name,slackRequest.text);
+		const slackResponse = {
+		response_type: 'in_channel',
+		text: `Vacation date(s) removed:`,
+		attachments: [
+			{
+			text: `${message}`,
+			},
+		],
+		};
+		axios
+		.post(slackRequest.response_url, slackResponse)
+		res.status(200).send();
+	}
+});
+
 app.server.listen(8080 || config.port, () => { //process.env.PORT 
     console.log(`Started on port ${app.server.address().port}`);
 });
