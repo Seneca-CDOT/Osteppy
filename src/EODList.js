@@ -9,6 +9,7 @@ const EODPath = path.join(__dirname, "../config-files/eods.json");
 var EODs = JSON.parse(fs.readFileSync(EODPath));
 var EODContent = fs.readFileSync(EODReminderPath);
 var EODJSON = JSON.parse(EODContent);
+const { execSync } = require('child_process');
 
 
 // Saves an EOD reminder
@@ -23,6 +24,7 @@ var addEODReminder = (name, message) => {
         EODJSON[name] = {"reminders" : [reminderJSON]}
     }
     fs.writeFileSync(EODReminderPath, JSON.stringify(EODJSON), 'utf8');
+    execSync("systemctl restart eod-reminder.service");
     return JSON.stringify(reminderJSON);
 }
 
@@ -48,6 +50,7 @@ var removeEODReminder = (name, number) => { //module.exports.
     if (EODJSON[name] !== undefined){
         var removedReminder = EODJSON[name]["reminders"].splice(number, 1);
         fs.writeFileSync(EODReminderPath, JSON.stringify(EODJSON), 'utf8');
+        execSync("systemctl restart eod-reminder.service");
         return JSON.stringify(removedReminder[0]);
     }
 }
@@ -56,7 +59,8 @@ var removeEODReminder = (name, number) => { //module.exports.
 var submitEOD  = (name, data) => {
 	EODs[name] = data;
 	sleepyRANames = sleepyRANames.filter(n => n!== name);
-	fs.writeFileSync(EODPath, JSON.stringify(EODs), 'utf8');
+    fs.writeFileSync(EODPath, JSON.stringify(EODs), 'utf8');
+    execSync("systemctl restart eod-reminder.service");
 	fs.writeFileSync(sleepyRAPath, sleepyRANames.join('\n') + "\n", 'utf8');
 }
 
