@@ -49,5 +49,4 @@ for (let i = 0; i <= 4; i ++){
 }
 
 
-//const holidayDates = fs.readFileSync(holidayDatesPath).toString().split('\n');
 fs.writeFileSync(holidayDatesPath, employeeHolidays.join('\n') + "\n", 'utf8');

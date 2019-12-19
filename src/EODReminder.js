@@ -14,16 +14,14 @@
 const fs = require('fs');
 const path = require('path');
 
-const { execSync } = require('child_process');
 const { WebClient } = require('@slack/web-api'); //const { WebClient } = require('@slack/client');
-
 const slackToken = fs.readFileSync(path.resolve(__dirname, '../config-files/SLACK_TOKEN'), 'utf8');
 const web = new WebClient(slackToken);
 const channelIDs = require(path.join(__dirname, '../config-files/channelID.json'));
 const eodReminders = require(path.join(__dirname, '../config-files/EODReminderTimes.json'));
 const sleepyRANames = fs.readFileSync(path.resolve(__dirname, '../config-files/sleepyRAs.txt')).toString().split('\n');
-const holidays = require(path.join(__dirname, '../config-files/holidays.json'));
-
+const holidayDatesPath = path.join(__dirname, '../config-files/holidays.txt');
+const holidayDates = fs.readFileSync(holidayDatesPath).toString().split('\n');
 
 const today = new Date();
 
@@ -36,8 +34,7 @@ const sendEODs = (reminders) => {
 }
 
 const checkHoliday = () => {
-    if (holidays[today.getFullYear()] !== undefined && holidays[today.getFullYear()][today.getMonth()+1] !== undefined
-        && holidays[today.getFullYear()][today.getMonth()+1].includes(today.getDate())){
+    if (holidayDates.indexOf(new Date().toISOString().slice(0, 10)) != -1) {
         return true;
     }
     return false;
@@ -84,6 +81,5 @@ const sendNextReminders = () => {
     setTimeout(() => sendEODs(nextReminders), nextReminderSeconds);
     }
 }
-
 
 sendNextReminders();
