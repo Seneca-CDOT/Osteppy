@@ -22,7 +22,7 @@ const eodReminders = require(path.join(__dirname, '../config-files/EODReminderTi
 const sleepyRANames = fs.readFileSync(path.resolve(__dirname, '../config-files/sleepyRAs.txt')).toString().split('\n');
 const holidayDatesPath = path.join(__dirname, '../config-files/holidays.txt');
 const holidayDates = fs.readFileSync(holidayDatesPath).toString().split('\n');
-
+const holiday = require('./checkHoliday');
 const today = new Date();
 
 // Local function used to send EOD reminders
@@ -42,6 +42,7 @@ const checkHoliday = () => {
 
 // Sends the next successive EOD reminders
 const sendNextReminders = () => {
+    holiday.writeHolidays();
     if (!checkHoliday()) {
         let nextReminderSeconds = 604800000;
         let nextReminderTime = [];
