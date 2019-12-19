@@ -1,24 +1,18 @@
 #!/usr/bin/env node
 
-var Holidays = require('date-holidays')
+const Holidays = require('date-holidays')
 const country = 'CA';
-var hd = new Holidays(country);
+const hd = new Holidays(country);
+const path = require("path");
+const fs = require("fs");
+const holidayDatesPath = path.join(__dirname, '../config-files/holidays.txt');
+const nationalHolidays = hd.getHolidays(2019);
 
+var employeeHolidays = [];
 
+//console.log(nationalHolidays);
 
-
-//console.log(hd.getStates(country));
-
-//console.log(hd.getRegions('CA', 'on'));
-
-//console.log(hd.getStates('US'));
-
-//console.log(hd.getRegions('US', 'la'));
-
-console.log(hd.getHolidays(2019));
-
-
-function nthWeekdayOfMonth(weekday, n, date) {
+nthWeekdayOfMonth = (weekday, n, date) => {
     var count = 0,
         idate = new Date(date.getFullYear(), date.getMonth(), 1);
     while (true) {
@@ -32,14 +26,28 @@ function nthWeekdayOfMonth(weekday, n, date) {
     return idate;
 }
 
-var familyDayDate = nthWeekdayOfMonth(1, 3, new Date(new Date().getFullYear(), 1));
+nationalHolidays.forEach(holiday => {
+    if (holiday.type === 'public' && new Date(holiday.date).getMonth() != 0 && new Date(holiday.date).getMonth() != 11 && holiday.name != 'Remembrance Day' && holiday.name != 'Easter Sunday') {
+        //console.log(holiday);
+        employeeHolidays.push(holiday.date.slice(0,10));
+    }
+});
 
-var lastWinterHolidayDate = nthWeekdayOfMonth(5, 1, new Date(new Date().getFullYear(), 0));
+const familyDayDate = nthWeekdayOfMonth(1, 3, new Date(new Date().getFullYear(), 1)).toISOString().slice(0,10);
+employeeHolidays.push(familyDayDate);
 
-console.log (lastWinterHolidayDate);
+const firstWinterHolidayDate = nthWeekdayOfMonth(1, 4, new Date(new Date().getFullYear(), 11));
+const lastWinterHolidayDateThisYear = nthWeekdayOfMonth(5, 1, new Date(new Date().getFullYear(), 0));
+const lastWinterHolidayDateNextYear = nthWeekdayOfMonth(5, 1, new Date(new Date().getFullYear() + 1, 0));
+// 4th monday in December to 1st friday of January
 
-//console.log (familyDay);
 
-const holidayDatesPath = path.join(__dirname, '../config-files/holidays.txt');
-var holidayDates = fs.readFileSync(holidayDatesPath).toString().split('\n');
-fs.writeFileSync(holidayDatesPath, holidayDates.join('\n') + "\n", 'utf8');
+for (let i = 0; i <= 4; i ++){
+    employeeHolidays.push((new Date (new Date(firstWinterHolidayDate).getTime() + i * (24 * 60 * 60 * 1000))).toISOString().slice(0,10));
+    employeeHolidays.push((new Date (new Date(lastWinterHolidayDateThisYear).getTime() + (i-4) * (24 * 60 * 60 * 1000))).toISOString().slice(0,10));
+    employeeHolidays.push((new Date (new Date(lastWinterHolidayDateNextYear).getTime() + (i-4) * (24 * 60 * 60 * 1000))).toISOString().slice(0,10));
+}
+
+
+//const holidayDates = fs.readFileSync(holidayDatesPath).toString().split('\n');
+fs.writeFileSync(holidayDatesPath, employeeHolidays.join('\n') + "\n", 'utf8');
