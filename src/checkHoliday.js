@@ -28,7 +28,8 @@ nthWeekdayOfMonth = (weekday, n, date) => {
 
 writeHolidays = () => {
     nationalHolidays.forEach(holiday => {
-        if (holiday.type === 'public' && new Date(holiday.date).getMonth() != 0 && new Date(holiday.date).getMonth() != 11 && holiday.name != 'Remembrance Day' && holiday.name != 'Easter Sunday') {
+        let holidayMonth = new Date(holiday.date).getMonth();
+        if (holiday.type === 'public' && holidayMonth !== 0 && holidayMonth !== 11 && holiday.name != 'Remembrance Day' && holiday.name != 'Easter Sunday') {
             //console.log(holiday);
             employeeHolidays.push(holiday.date.slice(0,10));
         }
@@ -38,9 +39,10 @@ writeHolidays = () => {
     const familyDayDate = nthWeekdayOfMonth(1, 3, new Date(new Date().getFullYear(), 1)).toISOString().slice(0,10);
     employeeHolidays.push(familyDayDate);
     
-    const firstWinterHolidayDate = nthWeekdayOfMonth(1, 4, new Date(new Date().getFullYear(), 11));
-    const lastWinterHolidayDateThisYear = nthWeekdayOfMonth(5, 1, new Date(new Date().getFullYear(), 0));
-    const lastWinterHolidayDateNextYear = nthWeekdayOfMonth(5, 1, new Date(new Date().getFullYear() + 1, 0));
+    const currentYear = new Date(new Date().getFullYear());
+    const firstWinterHolidayDate = nthWeekdayOfMonth(1, 4, currentYear, 11);
+    const lastWinterHolidayDateThisYear = nthWeekdayOfMonth(5, 1, currentYear, 0);
+    const lastWinterHolidayDateNextYear = nthWeekdayOfMonth(5, 1, currentYear + 1, 0);
     
     // Add the winter holidays to list of holidays: 4th Monday of December to 1st Friday of January
     for (let i = 0; i <= 4; i ++){
