@@ -20,8 +20,6 @@ const web = new WebClient(slackToken);
 const channelIDs = require(path.join(__dirname, '../config-files/channelID.json'));
 const eodReminders = require(path.join(__dirname, '../config-files/EODReminderTimes.json'));
 const sleepyRANames = fs.readFileSync(path.resolve(__dirname, '../config-files/sleepyRAs.txt')).toString().split('\n');
-const holidayDatesPath = path.join(__dirname, '../config-files/holidays.txt');
-const holidayDates = fs.readFileSync(holidayDatesPath).toString().split('\n');
 const holiday = require('./checkHoliday');
 const today = new Date();
 
@@ -34,7 +32,8 @@ const sendEODs = (reminders) => {
 }
 
 const checkHoliday = () => {
-    if (holidayDates.indexOf(new Date().toISOString().slice(0, 10)) != -1) {
+    const holidayJSON = require(path.join(__dirname, '../config-files/holidays.json'));
+    if (holidayJSON["holidays"].indexOf(new Date().toISOString().slice(0, 10)) != -1) {      
         return true;
     }
     return false;
@@ -67,19 +66,22 @@ const sendNextReminders = () => {
         });
 
         sleepyRANames.forEach((name) => {
-        if (eodReminders[name] !== undefined){
-        const reminderArr = eodReminders[name]["reminders"];
-            for (var i = 0; i < reminderArr.length; i++){
-                const reminder = reminderArr[i];
-                const reminderTime = reminder["time"].split(":");
-                if (reminder["weekday"].includes(today.getDay()) && reminderTime[0] === nextReminderTime[0] && reminderTime[1] === nextReminderTime[1]){
-                    nextReminders.push([name, reminder["message"]]);
+            if (eodReminders[name] !== undefined){
+            const reminderArr = eodReminders[name]["reminders"];
+                for (var i = 0; i < reminderArr.length; i++){
+                    const reminder = reminderArr[i];
+                    const reminderTime = reminder["time"].split(":");
+                    if (reminder["weekday"].includes(today.getDay()) && reminderTime[0] === nextReminderTime[0] && reminderTime[1] === nextReminderTime[1]){
+                        nextReminders.push([name, reminder["message"]]);
+                    }
                 }
             }
-        }
-    });
+        });
 
-    setTimeout(() => sendEODs(nextReminders), nextReminderSeconds);
+        setTimeout(() => sendEODs(nextReminders), nextReminderSeconds);
+    } else {
+        var timeTillTomorrow = new Date(today.getFullYear(),  today.getMonth(), today.getDate()+1) - today;
+        setTimeout(() => {}, timeTillTomorrow);
     }
 }
 
