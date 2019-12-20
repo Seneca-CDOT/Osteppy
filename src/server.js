@@ -14,6 +14,7 @@ const fs = require('fs');
 //const EODList = require('./EODList');
 const bodyParser = require('body-parser');
 const EOD = require('./EODList');
+const today = new Date();
 
 const app = express();
 
@@ -26,10 +27,12 @@ app.use(bodyParser.urlencoded({
 // Slash command for submitting EOD's
 app.post('/eod', (req, res) => {
 	const slackRequest = req.body;
-
+	if (today.getHours() < 10) {
+		today.setDate(today.getDate()-1);
+	}
 	const slackResponse = {
 	response_type: 'in_channel',
-	text: `:checkered_flag: EOD was submitted by *${slackRequest.user_name}*`,
+	text: `:checkered_flag: EOD was submitted by *${slackRequest.user_name}* on ${today.getFullYear()}/${today.getMonth()+1}/${today.getDate()}`,
 	attachments: [
 		{
 		text: `${slackRequest.text}`,
@@ -210,6 +213,7 @@ app.post('/set_vacation', (req, res) => {
 app.server.listen(8080 || config.port, () => { //process.env.PORT 
     console.log(`Started on port ${app.server.address().port}`);
 });
+
 
 
 //Tests
