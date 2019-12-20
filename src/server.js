@@ -27,7 +27,9 @@ app.use(bodyParser.urlencoded({
 // Slash command for submitting EOD's
 app.post('/eod', (req, res) => {
 	const slackRequest = req.body;
-
+	if (today.getHours() < 10) {
+		today.setDate(today.getDate()-1);
+	}
 	const slackResponse = {
 	response_type: 'in_channel',
 	text: `:checkered_flag: EOD was submitted by *${slackRequest.user_name}* on ${today.getFullYear()}/${today.getMonth()+1}/${today.getDate()}`,
