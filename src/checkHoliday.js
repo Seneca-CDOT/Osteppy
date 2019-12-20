@@ -12,6 +12,8 @@ var employeeHolidays = [];
 
 //console.log(nationalHolidays);
 
+//Credits to Michael Laszlo for his nthWeekdayOfMonth function
+//Source code: https://stackoverflow.com/a/32193378
 nthWeekdayOfMonth = (weekday, n, date) => {
     var count = 0,
         idate = new Date(date.getFullYear(), date.getMonth(), 1);
