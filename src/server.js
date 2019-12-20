@@ -22,7 +22,11 @@ app.server = http.createServer(app);
 
 app.use(bodyParser.urlencoded({
     extended: true,
-  }));
+}));
+
+// Slash command for setting EOD Reminder channel
+// ${slackRequest.channel_id}
+
 
 // Slash command for submitting EOD's
 app.post('/eod', (req, res) => {
