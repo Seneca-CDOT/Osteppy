@@ -7,11 +7,18 @@ const sleepyRAPath = path.join(__dirname, '../config-files/sleepyRAs.txt');
 var sleepyRANames = fs.readFileSync(sleepyRAPath).toString().split('\n');
 const EODPath = path.join(__dirname, "../config-files/eods.json");
 var EODs = JSON.parse(fs.readFileSync(EODPath));
-var EODContent = fs.readFileSync(EODReminderPath);
+const EODContent = fs.readFileSync(EODReminderPath);
 var EODJSON = JSON.parse(EODContent);
 const { execSync } = require('child_process');
+const channelIDs = require(path.join(__dirname, '../config-files/channelID.json'));
 
-
+// Check if user is in channelID
+const checkUserChannelID = (name) => {
+    if (channelIDs[name] !== undefined){
+        return true;
+    }
+    return false;
+}
 
 // Saves an EOD reminder
 const addEODReminder = (name, message) => {
@@ -70,6 +77,7 @@ const getSleepyRAs  = () => {
     return sleepyRANames;
 }
 
+exports.checkUserChannelID = checkUserChannelID;
 exports.addEODReminder = addEODReminder;
 exports.viewEODReminders = viewEODReminders;
 exports.getNumEODs = getNumEODs;
