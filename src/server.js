@@ -27,15 +27,25 @@ app.use(bodyParser.urlencoded({
 // Slash command for submitting EOD's
 app.post('/eod', (req, res) => {
 	const slackRequest = req.body;
+	const emojiIndex = slackRequest.text.indexOf(":");
+	let emoji = "checkered_flag";
+	let message = slackRequest.text;
+  	if (emojiIndex == 0 || emojiIndex == 1) {
+		const emojiEndIndex = slackRequest.text.indexOf(":", emojiIndex + 1);
+		if (emojiEndIndex != -1){
+			emoji = slackRequest.text.substring(emojiIndex + 1, emojiEndIndex);
+			message = message.substring (emojiEndIndex + 1);
+		}
+	}
 	if (today.getHours() < 10) {
 		today.setDate(today.getDate()-1);
 	}
 	const slackResponse = {
 	response_type: 'in_channel',
-	text: `:checkered_flag: EOD was submitted by *${slackRequest.user_name}* on ${today.getFullYear()}/${today.getMonth()+1}/${today.getDate()}`,
+	text: `:${emoji}: EOD was submitted by *${slackRequest.user_name}* on ${today.getFullYear()}/${today.getMonth()+1}/${today.getDate()}`,
 	attachments: [
 		{
-		text: `${slackRequest.text}`,
+		text: `${message}`,
 		},
 	],
 	};
