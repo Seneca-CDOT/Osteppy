@@ -12,8 +12,9 @@ var EODJSON = JSON.parse(EODContent);
 const { execSync } = require('child_process');
 
 
+
 // Saves an EOD reminder
-var addEODReminder = (name, message) => {
+const addEODReminder = (name, message) => {
     var messageArr = message.split(";");
     var reminderJSON = JSON.parse('{ "time": ' + '"' + messageArr[0]
     + '", ' + '"weekday": [' +  messageArr[1].split(",")
@@ -29,7 +30,7 @@ var addEODReminder = (name, message) => {
 }
 
 // Returns EOD reminders in JSON format
-var viewEODReminders = (name) => {
+const viewEODReminders = (name) => {
     if (EODJSON[name] !== undefined){
         return EODJSON[name]["reminders"];
     } else {
@@ -38,7 +39,7 @@ var viewEODReminders = (name) => {
 }
 
 // Gets the number of reminders
-var getNumEODs = (name) => {
+const getNumEODs = (name) => {
     if (EODJSON[name] !== undefined) {
         return EODJSON[name]["reminders"].length;
     }
@@ -46,7 +47,7 @@ var getNumEODs = (name) => {
 }
 
 // Removes an EOD reminder
-var removeEODReminder = (name, number) => { //module.exports.
+const removeEODReminder = (name, number) => { //module.exports.
     if (EODJSON[name] !== undefined){
         var removedReminder = EODJSON[name]["reminders"].splice(number, 1);
         fs.writeFileSync(EODReminderPath, JSON.stringify(EODJSON), 'utf8');
@@ -56,7 +57,7 @@ var removeEODReminder = (name, number) => { //module.exports.
 }
 
 // Submits an EOD reminder
-var submitEOD  = (name, data) => {
+const submitEOD  = (name, data) => {
 	EODs[name] = data;
 	sleepyRANames = sleepyRANames.filter(n => n!== name);
     fs.writeFileSync(EODPath, JSON.stringify(EODs), 'utf8');
@@ -65,7 +66,7 @@ var submitEOD  = (name, data) => {
 }
 
 // Returns list of people who haven't submit their EOD's yet
-var getSleepyRAs  = () => {
+const getSleepyRAs  = () => {
     return sleepyRANames;
 }
 
