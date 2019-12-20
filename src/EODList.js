@@ -10,10 +10,10 @@ var EODs = JSON.parse(fs.readFileSync(EODPath));
 const EODContent = fs.readFileSync(EODReminderPath);
 var EODJSON = JSON.parse(EODContent);
 const { execSync } = require('child_process');
-const channelIDs = require(path.join(__dirname, '../config-files/channelID.json'));
 
 // Check if user is in channelID
 const checkUserChannelID = (name) => {
+    const channelIDs = require(path.join(__dirname, '../config-files/channelID.json'));
     if (channelIDs[name] !== undefined){
         return true;
     }
