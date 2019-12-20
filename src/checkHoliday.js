@@ -28,7 +28,7 @@ nthWeekdayOfMonth = (weekday, n, date) => {
 
 writeHolidays = () => {
     nationalHolidays.forEach(holiday => {
-        let holidayMonth = new Date(holiday.date).getMonth();
+        const holidayMonth = new Date(holiday.date).getMonth();
         if (holiday.type === 'public' && holidayMonth !== 0 && holidayMonth !== 11 && holiday.name != 'Remembrance Day' && holiday.name != 'Easter Sunday') {
             //console.log(holiday);
             employeeHolidays.push(holiday.date.slice(0,10));
