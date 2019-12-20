@@ -6,9 +6,11 @@ const hd = new Holidays(country);
 const path = require("path");
 const fs = require("fs");
 const holidayDatesPath = path.join(__dirname, '../config-files/holidays.txt');
+const holidayJSONPath = path.join(__dirname, '../config-files/holidays.json');
 const currentYear = new Date().getFullYear();
 const nationalHolidays = hd.getHolidays(currentYear);
 var employeeHolidays = [];
+var holidayJSON = {"holidays": []};
 
 //console.log(nationalHolidays);
 
@@ -33,13 +35,15 @@ writeHolidays = () => {
         const holidayMonth = new Date(holiday.date).getMonth();
         if (holiday.type === 'public' && holidayMonth !== 0 && holidayMonth !== 11 && holiday.name != 'Remembrance Day' && holiday.name != 'Easter Sunday') {
             //console.log(holiday);
-            employeeHolidays.push(holiday.date.slice(0,10));
+			employeeHolidays.push(holiday.date.slice(0,10));
+			holidayJSON["holidays"].push(holiday.date.slice(0,10));
         }
     });
 
     // Add family day to the list of holidays
     const familyDayDate = nthWeekdayOfMonth(1, 3, new Date(currentYear, 1)).toISOString().slice(0,10);
-    employeeHolidays.push(familyDayDate);
+	employeeHolidays.push(familyDayDate);
+	holidayJSON["holidays"].push(familyDayDate);
 	const firstWinterHolidayDate = nthWeekdayOfMonth(1, 4, new Date(currentYear, 11));
     const lastWinterHolidayDateThisYear = nthWeekdayOfMonth(5, 1, new Date(currentYear, 0));
     const lastWinterHolidayDateNextYear = nthWeekdayOfMonth(5, 1, new Date(currentYear + 1, 0));
@@ -48,10 +52,14 @@ writeHolidays = () => {
     for (let i = 0; i <= 4; i ++){
         employeeHolidays.push((new Date (new Date(firstWinterHolidayDate).getTime() + i * (24 * 60 * 60 * 1000))).toISOString().slice(0,10));
         employeeHolidays.push((new Date (new Date(lastWinterHolidayDateThisYear).getTime() + (i-4) * (24 * 60 * 60 * 1000))).toISOString().slice(0,10));
-        employeeHolidays.push((new Date (new Date(lastWinterHolidayDateNextYear).getTime() + (i-4) * (24 * 60 * 60 * 1000))).toISOString().slice(0,10));
+		employeeHolidays.push((new Date (new Date(lastWinterHolidayDateNextYear).getTime() + (i-4) * (24 * 60 * 60 * 1000))).toISOString().slice(0,10));
+		holidayJSON["holidays"].push((new Date (new Date(firstWinterHolidayDate).getTime() + i * (24 * 60 * 60 * 1000))).toISOString().slice(0,10));
+		holidayJSON["holidays"].push((new Date (new Date(lastWinterHolidayDateThisYear).getTime() + (i-4) * (24 * 60 * 60 * 1000))).toISOString().slice(0,10));
+		holidayJSON["holidays"].push((new Date (new Date(lastWinterHolidayDateNextYear).getTime() + (i-4) * (24 * 60 * 60 * 1000))).toISOString().slice(0,10));
     }
     
-    fs.writeFileSync(holidayDatesPath, employeeHolidays.join('\n') + "\n", 'utf8');
+	fs.writeFileSync(holidayDatesPath, employeeHolidays.join('\n') + "\n", 'utf8');
+	fs.writeFileSync(holidayJSONPath, JSON.stringify(holidayJSON), 'utf8');
 }
 
 //writeHolidays();
