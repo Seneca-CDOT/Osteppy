@@ -15,6 +15,8 @@ const fs = require('fs');
 const bodyParser = require('body-parser');
 const EOD = require('./EODList');
 const today = new Date();
+const channelIDs = require(path.join(__dirname, '../config-files/channelID.json'));
+const channelIDPath = path.join(__dirname, "../config-files/channelID.json");
 
 const app = express();
 
@@ -24,9 +26,30 @@ app.use(bodyParser.urlencoded({
     extended: true,
 }));
 
+const setChannelID = (name, ID) => {
+	channelIDs[name] = ID;
+	fs.writeFileSync(channelIDPath, JSON.stringify(channelIDs), 'utf8');
+}
+
 // Slash command for setting EOD Reminder channel
 // ${slackRequest.channel_id}
+app.post('/set_eod_reminder_channel', (req, res) => {
+	const slackRequest = req.body;
+  
+	setChannelID(slackRequest.user_name, slackRequest.channel_id);
 
+	const slackResponse = {
+	  response_type: 'in_channel',
+	  text: 'EOD reminders will now be received in this channel.'
+	};
+	axios
+	  .post(slackRequest.response_url, slackResponse)
+	  .catch((error) => {
+		console.log(`error: ${error}`);
+	  });
+  
+	res.status(200).send();
+});
 
 // Slash command for submitting EOD's
 app.post('/eod', (req, res) => {
