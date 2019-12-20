@@ -113,30 +113,39 @@ app.post('/eods_left', (req, res) => {
 app.post('/add_eod_reminder', (req, res) => {
 	const slackRequest = req.body;
 	
-	if (slackRequest.text.split(";").length == 3){
-		const message = EOD.addEODReminder(slackRequest.user_name,slackRequest.text);
-		const slackResponse = {
-		response_type: 'in_channel',
-		text: `EOD added:`,
-		attachments: [
-			{
-			text: `${message}`,
-			},
-		],
-		};
-		axios
-		.post(slackRequest.response_url, slackResponse)
-		res.status(200).send();
+	if (EOD.checkUserChannelID(slackRequest.user_name)){
+		if (slackRequest.text.split(";").length == 3){
+			const message = EOD.addEODReminder(slackRequest.user_name,slackRequest.text);
+			const slackResponse = {
+			response_type: 'in_channel',
+			text: `EOD added:`,
+			attachments: [
+				{
+				text: `${message}`,
+				},
+			],
+			};
+			axios
+			.post(slackRequest.response_url, slackResponse)
+			res.status(200).send();
+		} else {
+			const slackResponse = {
+			response_type: 'in_channel',
+			text: `ERROR: Wrong syntax used. Correct syntax: time;weekdays;"message"`,
+			attachments: [
+				{
+				text: `Eg. 17:00;1,2,3,4,5;"It's 5PM, remember to submit EOD! :robot_face:"\n Your message: ${slackRequest.text}`,
+				},
+			],
+			};
+			axios
+			.post(slackRequest.response_url, slackResponse)
+			res.status(200).send();
+		}
 	} else {
-		//console.log("add_eod_reminder failed: " + slackRequest.text.split(";").length)
 		const slackResponse = {
 		response_type: 'in_channel',
-		text: `ERROR: Wrong syntax used. Correct syntax: time;weekdays;"message"`,
-		attachments: [
-			{
-			text: `Eg. 17:00;1,2,3,4,5;"It's 5PM, remember to submit EOD! :robot_face:"\n Your message: ${slackRequest.text}`,
-			},
-		],
+		text: `ERROR: Your slack username: ${slackRequest.user_name} was not found among the channel IDs. Please call /set_eod_reminder_channel before adding an EOD reminder.`
 		};
 		axios
 		.post(slackRequest.response_url, slackResponse)
