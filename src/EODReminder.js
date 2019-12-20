@@ -33,7 +33,7 @@ const sendEODs = (reminders) => {
 
 const checkHoliday = () => {
     const holidayJSON = require(path.join(__dirname, '../config-files/holidays.json'));
-    if (holidayJSON["holidays"].indexOf(new Date().toISOString().slice(0, 10)) != -1) {      
+    if (holidayJSON["holidays"].includes(new Date().toISOString().slice(0, 10))) {      
         return true;
     }
     return false;
