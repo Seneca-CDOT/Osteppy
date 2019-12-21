@@ -15,6 +15,8 @@ const fs = require('fs');
 const bodyParser = require('body-parser');
 const EOD = require('./EODList');
 const today = new Date();
+const channelIDs = require(path.join(__dirname, '../config-files/channelID.json'));
+const channelIDPath = path.join(__dirname, "../config-files/channelID.json");
 
 const app = express();
 
@@ -22,7 +24,32 @@ app.server = http.createServer(app);
 
 app.use(bodyParser.urlencoded({
     extended: true,
-  }));
+}));
+
+const setChannelID = (name, ID) => {
+	channelIDs[name] = ID;
+	fs.writeFileSync(channelIDPath, JSON.stringify(channelIDs), 'utf8');
+}
+
+// Slash command for setting EOD Reminder channel
+// ${slackRequest.channel_id}
+app.post('/set_eod_reminder_channel', (req, res) => {
+	const slackRequest = req.body;
+  
+	setChannelID(slackRequest.user_name, slackRequest.channel_id);
+
+	const slackResponse = {
+	  response_type: 'in_channel',
+	  text: 'EOD reminders will now be received in this channel.'
+	};
+	axios
+	  .post(slackRequest.response_url, slackResponse)
+	  .catch((error) => {
+		console.log(`error: ${error}`);
+	  });
+  
+	res.status(200).send();
+});
 
 // Slash command for submitting EOD's
 app.post('/eod', (req, res) => {
@@ -86,30 +113,39 @@ app.post('/eods_left', (req, res) => {
 app.post('/add_eod_reminder', (req, res) => {
 	const slackRequest = req.body;
 	
-	if (slackRequest.text.split(";").length == 3){
-		const message = EOD.addEODReminder(slackRequest.user_name,slackRequest.text);
-		const slackResponse = {
-		response_type: 'in_channel',
-		text: `EOD added:`,
-		attachments: [
-			{
-			text: `${message}`,
-			},
-		],
-		};
-		axios
-		.post(slackRequest.response_url, slackResponse)
-		res.status(200).send();
+	if (EOD.checkUserChannelID(slackRequest.user_name)){
+		if (slackRequest.text.split(";").length == 3){
+			const message = EOD.addEODReminder(slackRequest.user_name,slackRequest.text);
+			const slackResponse = {
+			response_type: 'in_channel',
+			text: `EOD added:`,
+			attachments: [
+				{
+				text: `${message}`,
+				},
+			],
+			};
+			axios
+			.post(slackRequest.response_url, slackResponse)
+			res.status(200).send();
+		} else {
+			const slackResponse = {
+			response_type: 'in_channel',
+			text: `ERROR: Wrong syntax used. Correct syntax: time;weekdays;"message"`,
+			attachments: [
+				{
+				text: `Eg. 17:00;1,2,3,4,5;"It's 5PM, remember to submit EOD! :robot_face:"\n Your message: ${slackRequest.text}`,
+				},
+			],
+			};
+			axios
+			.post(slackRequest.response_url, slackResponse)
+			res.status(200).send();
+		}
 	} else {
-		//console.log("add_eod_reminder failed: " + slackRequest.text.split(";").length)
 		const slackResponse = {
 		response_type: 'in_channel',
-		text: `ERROR: Wrong syntax used. Correct syntax: time;weekdays;"message"`,
-		attachments: [
-			{
-			text: `Eg. 17:00;1,2,3,4,5;"It's 5PM, remember to submit EOD! :robot_face:"\n Your message: ${slackRequest.text}`,
-			},
-		],
+		text: `ERROR: Your slack username: ${slackRequest.user_name} was not found among the channel IDs. Please call /set_eod_reminder_channel before adding an EOD reminder.`
 		};
 		axios
 		.post(slackRequest.response_url, slackResponse)
