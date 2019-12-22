@@ -22,17 +22,22 @@ resetRAList = () => {
 };
 
 const findNextWeekday = () => {
-    // If today is a weekday other than Friday, reset the user list tomorrow at 10AM
-    if (today.getDay() >= 1 &&  today.getDay() <= 4){
+    // If today is a weekday (other than Friday) or Subday, reset the user list tomorrow at 10AM
+    if (today.getDay() <= 4){
         return calculateNextWeekday(1); 
-    } else if (today.getDay() == 5) { //If today is Friday, reset the user list next Monday
-        return calculateNextWeekday(3);
-    }
+    //If today is Friday or Saturday, reset the user list next Monday
+    } else { 
+        return calculateNextWeekday(8 - today.getDay());
+    } 
 }
 
 const calculateNextWeekday = (nextWeekday) => {
     const restartDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + nextWeekday, resetHour, 0, 0);
-    return restartDate - today;
+    restartMiliseconds = restartDate - today;
+    restartHours = parseInt(restartMiliseconds/3600000);
+    restartDays = parseInt(restartHours/24);
+    console.log (`DEBUG: Restarting in ${restartDays} day(s) and ${parseInt(restartHours - restartDays*24)} hour(s) and ${parseInt((restartMiliseconds/60000)-restartHours*60)} minute(s)`);
+    return restartMiliseconds;
 }
 
 setTimeout(() => resetRAList(), findNextWeekday());
