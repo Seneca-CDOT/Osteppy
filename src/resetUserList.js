@@ -16,18 +16,24 @@ const { execSync } = require('child_process');
 const cpCommand = 'cp ' + path.join(__dirname, '../config-files/RAs.txt') + " " + path.join(__dirname, '../config-files/sleepyRAs.txt')
 const today = new Date();
 const resetHour = 10;
+const MONDAY = 1;
+const THURSDAY = 4;
+const FRIDAY = 5;
 
 resetRAList = () => {
     execSync(cpCommand);
 };
 
 const findNextWeekday = () => {
-    // If today is a weekday (other than Friday) or Subday, reset the user list tomorrow at 10AM
-    if (today.getDay() <= 4){
+    // If today is a weekday (other than Friday) or Sunday, reset the user list tomorrow at 10AM
+    if (today.getDay() >= MONDAY && today.getDay() <= THURSDAY){
         return calculateNextWeekday(1); 
-    //If today is Friday or Saturday, reset the user list next Monday
+    //If today is Friday, reset the user list next Monday
+    } else if (today.getDay() == FRIDAY) {
+        return calculateNextWeekday(3);
+    //Else today is Saturday, reset the user list next Monday
     } else { 
-        return calculateNextWeekday(8 - today.getDay());
+        return calculateNextWeekday(2);
     } 
 }
 
