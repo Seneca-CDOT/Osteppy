@@ -10,11 +10,7 @@ Handles End of Day (EoD) slash commands and sending EoD reminders.
 
 ## Initial setup
 
-`Osteppy/src/osteppy_server_setup.sh`
-
-`Osteppy/src/osteppy_EOD_reminder_setup.sh`
-
-`Osteppy/src/reset_user_list_setup.sh`
+`Osteppy/src/osteppy_installation.sh`
 
 `npm install`
 
