@@ -8,15 +8,21 @@ Handles End of Day (EoD) slash commands and sending EoD reminders.
 * `/check_eod_reminders`: returns a list of your EoD reminders
 * `/remove_eod_reminder`: remove an EoD reminder
 
-## Initial setup
+## Initial setup 
+Note: installation scripts only support Linux distributions at the moment
 
-`Osteppy/src/osteppy_server_setup.sh`
+1. Install systemd package if you don't have it already
 
-`Osteppy/src/osteppy_EOD_reminder_setup.sh`
+2. Run installation scripts for Osteppy services
+* `Osteppy/src/osteppy_server_setup.sh`
 
-`Osteppy/src/reset_user_list_setup.sh`
+* `Osteppy/src/osteppy_EOD_reminder_setup.sh`
 
-`npm install`
+* `Osteppy/src/reset_user_list_setup.sh`
+
+3. Install npm packages
+
+* `npm install`
 
 ## Dev Run
 
