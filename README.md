@@ -1,6 +1,14 @@
-Handles EOD slash commands and sends EOD reminders
+Handles End of Day (EoD) slash commands and sending EoD reminders.
 
-### Initial setup
+## Usage
+* `/eod`: submits an EoD
+* `/eods_left`: returns a list of who have not submitted their EoD for the day
+* `/set_eod_reminder_channel`: sets the EoD reminder channel
+* `/add_eod_reminder`: adds an EoD reminder
+* `/check_eod_reminders`: returns a list of your EoD reminders
+* `/remove_eod_reminder`: remove an EoD reminder
+
+## Initial setup
 
 `Osteppy/src/osteppy_server_setup.sh`
 
@@ -10,13 +18,13 @@ Handles EOD slash commands and sends EOD reminders
 
 `npm install`
 
-### Dev Run
+## Dev Run
 
 `npm run dev`
 
 ## Instructions
 
-## Set up slack token
+### Set up slack token
 
 Store the Slack token as plain text in `Osteppy/config-files/SLACK_TOKEN`
 
