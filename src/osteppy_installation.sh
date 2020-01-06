@@ -3,7 +3,7 @@
 # Server setup script for SystemD Services
 
 # Rename location of service files
-NEWDIR=$(dirname "$(readlink -fm "$0")")
+NEWDIR=$(dirname "$(readlink -f "$0")")
 sed -i "s@OLDDIR@$NEWDIR@g" $NEWDIR/osteppy.service
 sed -i "s@OLDDIR@$NEWDIR@g" $NEWDIR/eod-reminder.service
 sed -i "s@OLDDIR@$NEWDIR@g" $NEWDIR/osteppy-reset-user-list.service
