@@ -13,17 +13,13 @@ Note: installation scripts only support Linux distributions at the moment
 
 1. Install systemd package if you don't have it already
 
-2. Run the installation script for Osteppy services
+2. Install npm packages
 
-* ``Osteppy/src/osteppy_installation.sh``
+    `npm install`
 
-3. Install npm packages
+3. Run the installation script for Osteppy services
 
-* `npm install`
-
-## Dev Run
-
-`npm run dev`
+    `Osteppy/src/osteppy_installation.sh`
 
 ## Instructions
 
