@@ -5,7 +5,7 @@ NEWDIR=$(dirname "$(readlink -fm "$0")")
 sed -i "s@OLDDIR@$NEWDIR@g" $NEWDIR/eod-reminder.service
 
 # Copy Unit Files
-cp $NEWDIR/eod-reminder.service /usr/lib/systemd/system/
+cp $NEWDIR/eod-reminder.service /etc/systemd/system/
 
 # Reload
 systemctl daemon-reload

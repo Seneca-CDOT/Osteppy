@@ -6,7 +6,7 @@ sed -i "s@OLDDIR@$NEWDIR@g" $NEWDIR/osteppy.service
 
 # Copy Unit Files
 
-cp $NEWDIR/osteppy.service /usr/lib/systemd/system/
+cp $NEWDIR/osteppy.service /etc/systemd/system/
 
 # Reload
 systemctl daemon-reload

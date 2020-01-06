@@ -6,7 +6,7 @@ sed -i "s@OLDDIR@$NEWDIR@g" $NEWDIR/osteppy-reset-user-list.service
 
 # Copy Unit Files
 
-cp $NEWDIR/osteppy-reset-user-list.service /usr/lib/systemd/system/
+cp $NEWDIR/osteppy-reset-user-list.service /etc/systemd/system/
 
 # Reload
 systemctl daemon-reload
