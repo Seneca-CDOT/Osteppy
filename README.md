@@ -13,20 +13,13 @@ Note: installation scripts only support Linux distributions at the moment
 
 1. Install systemd package if you don't have it already
 
-2. Run installation scripts for Osteppy services
-* `Osteppy/src/osteppy_server_setup.sh`
+2. Install npm packages
 
-* `Osteppy/src/osteppy_EOD_reminder_setup.sh`
+    `npm install`
 
-* `Osteppy/src/reset_user_list_setup.sh`
+3. Run the installation script for Osteppy services
 
-3. Install npm packages
-
-* `npm install`
-
-## Dev Run
-
-`npm run dev`
+    `Osteppy/src/osteppy_installation.sh`
 
 ## Instructions
 
