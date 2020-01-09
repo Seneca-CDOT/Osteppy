@@ -14,7 +14,6 @@ const fs = require('fs');
 //const EODList = require('./EODList');
 const bodyParser = require('body-parser');
 const EOD = require('./EODList');
-const today = new Date();
 const channelIDs = require(path.join(__dirname, '../config-files/channelID.json'));
 const channelIDPath = path.join(__dirname, "../config-files/channelID.json");
 
@@ -53,6 +52,7 @@ app.post('/set_eod_reminder_channel', (req, res) => {
 
 // Slash command for submitting EOD's
 app.post('/eod', (req, res) => {
+	const today = new Date();
 	const slackRequest = req.body;
 	const emojiIndex = slackRequest.text.indexOf(":");
 	let emoji = "checkered_flag";
