@@ -8,8 +8,4 @@
 /src/clock.txt
 *.env
 /config-files/*
-<<<<<<< HEAD
 !/config-files/.gitkeep
-=======
-!/config-files/.gitkeep
->>>>>>> feature/edit-EOD-reminder-slash-command
