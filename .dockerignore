@@ -1,0 +1,12 @@
+**/.circleci/
+**/.vscode/
+**/.idea/
+**/coverage/
+**/docs/
+**/node_modules/
+**/.DS_Store
+**/.dockerignore
+**/.gitignore
+**/Dockerfile
+**/README.md
+**/docker-compose.yml
