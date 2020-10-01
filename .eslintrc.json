@@ -29,7 +29,14 @@
         "js": "never",
         "ts": "never"
       }
-    ]
+    ],
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        "devDependencies": ["**/*.spec.ts"]
+      }
+    ],
+    "no-useless-constructor": "off"
   },
   "settings": {
     "import/resolver": {
