@@ -4,16 +4,16 @@ import { Document } from 'mongoose';
 @Schema()
 export class User extends Document {
   @Prop()
-  user_id = '';
+  userId = '';
 
   @Prop()
-  user_name = '';
+  userName = '';
 
   @Prop()
   eods: string[] = [];
 
   @Prop()
-  eod_status = true;
+  eodStatus = true;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
