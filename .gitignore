@@ -21,3 +21,6 @@ typings/
 # Config files
 config-files/
 !config-files/.gitkeep
+
+# MongoDB
+osteppy_data/
