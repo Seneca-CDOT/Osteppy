@@ -1,23 +1,11 @@
 version: '3'
 
-services:
-  osteppy:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    env_file: .env
-    ports:
-      - ${PORT}:${PORT}
-    depends_on:
-      - mongodb
-    restart: always
-  
+services:  
   mongodb:
     image: mongo:latest
-    env_file: .env
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_USER}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASS}
     volumes:
-      - ./osteppy_data:/data/db
+      - ./osteppy_data:/data/db:z
     restart: always

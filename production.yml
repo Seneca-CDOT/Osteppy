@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  osteppy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - MONGO_USER
+      - MONGO_PASS
+      - PORT
+      - MONGO_HOST
+    ports:
+      - ${PORT}:${PORT}
+    depends_on:
+      - mongodb
+    restart: always
