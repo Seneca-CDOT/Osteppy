@@ -6,7 +6,9 @@ import { User } from './schemas/user.schema';
 
 @Injectable()
 export default class UserService {
-  constructor(@InjectModel(User.name) private readonly UserModel: Model<User>) {}
+  constructor(
+    @InjectModel(User.name) private readonly UserModel: Model<User>,
+  ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const newUser = new this.UserModel(createUserDto);
