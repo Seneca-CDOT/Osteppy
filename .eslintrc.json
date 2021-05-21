@@ -40,12 +40,13 @@
         "devDependencies": ["**/*.spec.ts", "**/*.e2e-spec.ts"]
       }
     ],
-    "no-useless-constructor": "off"
+    "no-useless-constructor": "off",
+    "camelcase": "off"
   },
   "settings": {
     "import/resolver": {
       "node": {
-        "extensions": [".js", ".ts"]
+        "extensions": [".js", ".ts", ".d.ts"]
       }
     }
   }
