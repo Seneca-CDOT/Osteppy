@@ -8,7 +8,10 @@ export default class AuthenticationGuard implements CanActivate {
   canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest<CommandRequest>();
 
-    return AuthenticationGuard.guardSlackCommand(request);
+    return (
+      AuthenticationGuard.guardSlackCommand(request) &&
+      AuthenticationGuard.guardSlackWorkspace(request)
+    );
   }
 
   // Uses signed secrets:
@@ -38,6 +41,14 @@ export default class AuthenticationGuard implements CanActivate {
     const computedSignature = `${AuthenticationGuard.SLACK_AUTH_VERSION}=${hashedString}`;
 
     return computedSignature === signature;
+  }
+
+  static guardSlackWorkspace(request: CommandRequest) {
+    const {
+      body: { team_id },
+    } = request;
+
+    return team_id === process.env.SLACK_TEAM_ID;
   }
 
   static SLACK_AUTH_VERSION = 'v0';
