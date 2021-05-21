@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import type { Request } from 'express';
 
 export type CommandRequest = Request & {
