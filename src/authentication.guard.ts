@@ -1,12 +1,12 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { createHmac } from 'crypto';
-import { CommandRequest } from './types/slack';
+import SlackRequestDto from './dto/slack_request.dto';
 
 @Injectable()
 export default class AuthenticationGuard implements CanActivate {
   // eslint-disable-next-line class-methods-use-this
   canActivate(context: ExecutionContext) {
-    const request = context.switchToHttp().getRequest<CommandRequest>();
+    const request = context.switchToHttp().getRequest<SlackRequestDto>();
 
     return (
       AuthenticationGuard.guardSlackCommand(request) &&
@@ -16,7 +16,7 @@ export default class AuthenticationGuard implements CanActivate {
 
   // Uses signed secrets:
   // https://api.slack.com/authentication/verifying-requests-from-slack
-  static guardSlackCommand(request: CommandRequest) {
+  static guardSlackCommand(request: SlackRequestDto) {
     const {
       headers: {
         'x-slack-request-timestamp': requestTimestamp,
@@ -43,7 +43,7 @@ export default class AuthenticationGuard implements CanActivate {
     return computedSignature === signature;
   }
 
-  static guardSlackWorkspace(request: CommandRequest) {
+  static guardSlackWorkspace(request: SlackRequestDto) {
     const {
       body: { team_id },
     } = request;
