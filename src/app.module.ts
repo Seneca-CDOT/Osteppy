@@ -19,7 +19,6 @@ import UserService from './Users/users.service';
   providers: [AppService, UserService],
 })
 class AppModule {
-  // eslint-disable-next-line class-methods-use-this
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(BodyParserMiddleware).forRoutes('');
   }
