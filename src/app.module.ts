@@ -10,7 +10,11 @@ import UserModule from './user/user.module';
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    MongooseModule.forRoot(`mongodb://${MONGO.HOST}/osteppy`),
+    MongooseModule.forRoot(`mongodb://${MONGO.HOST}`, {
+      dbName: 'osteppy',
+      user: MONGO.USER,
+      pass: MONGO.PASS,
+    }),
     DevModule,
     UserModule,
   ],
