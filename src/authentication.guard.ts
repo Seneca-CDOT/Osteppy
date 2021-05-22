@@ -1,6 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { createHmac } from 'crypto';
 import * as formUrlencoded from 'form-urlencoded';
+import { SLACK } from './configuration';
 import SlackRequestDto from './dto/slack_request.dto';
 
 @Injectable()
@@ -37,7 +38,7 @@ export default class AuthenticationGuard implements CanActivate {
   // Ensure request is from specific workspace
   static guardSlackWorkspace(request: SlackRequestDto) {
     const { team_id } = request.body;
-    return team_id === process.env.SLACK_TEAM_ID;
+    return team_id === SLACK.TEAM_ID;
   }
 
   static computeSlackSignature(requestTimestamp: string, rawBody: string) {
@@ -47,10 +48,7 @@ export default class AuthenticationGuard implements CanActivate {
       rawBody,
     ].join(':');
 
-    const hashedString = createHmac(
-      'sha256',
-      process.env.SLACK_SIGNING_SECRET || '',
-    )
+    const hashedString = createHmac('sha256', SLACK.SIGNING_SECRET)
       .update(baseString)
       .digest('hex');
 
