@@ -4,6 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import AppController from './app.controller';
 import AppService from './app.service';
 import BodyParserMiddleware from './body_parser.middleware';
+import DevModule from './dev/dev.module';
 import { User, UserSchema } from './Users/schemas/user.schema';
 import UserService from './Users/users.service';
 
@@ -14,6 +15,7 @@ import UserService from './Users/users.service';
       `mongodb://${process.env.MONGO_HOST || 'localhost'}/users`,
     ),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    DevModule,
   ],
   controllers: [AppController],
   providers: [AppService, UserService],

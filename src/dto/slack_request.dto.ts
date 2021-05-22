@@ -1,3 +1,5 @@
+import type { Request } from 'express';
+
 export default class SlackRequestDto {
   constructor(
     public headers: {
@@ -11,5 +13,7 @@ export default class SlackRequestDto {
       use_name: string;
       team_id: string;
     },
+    // Express Request properties
+    public originalUrl: Request['originalUrl'],
   ) {}
 }
