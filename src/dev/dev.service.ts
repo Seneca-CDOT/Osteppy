@@ -14,23 +14,23 @@ export default class DevService {
       originalUrl,
     } = slackRequestDto;
 
-    // extract endpoint from request
+    // Extract endpoint from request
     let [endpoint] = body.text.split('\n');
     if (endpoint[0] !== '/') endpoint = `/${endpoint}`;
 
-    // prevent circular redirection
+    // Prevent circular redirection
     if (endpoint === originalUrl) {
       throw new HttpException('Circular routes', HttpStatus.BAD_REQUEST);
     }
 
-    // generate authentication for request body without the endpoint
+    // Generate authentication for request body without the endpoint
     const endRawBody = rawBody.replace(`${endpoint}\n`, '');
     const endSlackSignature = AuthenticationGuard.computeSlackSignature(
       timestamp,
       endRawBody,
     );
 
-    // go to the endpoint with new authentication and request body
+    // Go to the endpoint with new authentication and request body
     const endResponse = await request(getApp().getHttpServer())
       .post(endpoint)
       .set('x-slack-request-timestamp', timestamp)

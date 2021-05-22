@@ -13,7 +13,7 @@ export default class AuthenticationGuard implements CanActivate {
     );
   }
 
-  // Uses signed secrets:
+  // Ensure request is from Slack, using signed secrets:
   // https://api.slack.com/authentication/verifying-requests-from-slack
   static guardSlackCommand(request: SlackRequestDto) {
     const {
@@ -32,11 +32,9 @@ export default class AuthenticationGuard implements CanActivate {
     return computedSignature === signature;
   }
 
+  // Ensure request is from specific workspace
   static guardSlackWorkspace(request: SlackRequestDto) {
-    const {
-      body: { team_id },
-    } = request;
-
+    const { team_id } = request.body;
     return team_id === process.env.SLACK_TEAM_ID;
   }
 
