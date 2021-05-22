@@ -25,6 +25,23 @@ export default class AuthenticationGuard implements CanActivate {
       rawBody,
     } = request;
 
+    const computedSignature = AuthenticationGuard.computeSlackSignature(
+      requestTimestamp,
+      rawBody,
+    );
+
+    return computedSignature === signature;
+  }
+
+  static guardSlackWorkspace(request: SlackRequestDto) {
+    const {
+      body: { team_id },
+    } = request;
+
+    return team_id === process.env.SLACK_TEAM_ID;
+  }
+
+  static computeSlackSignature(requestTimestamp: string, rawBody: string) {
     const baseString = [
       AuthenticationGuard.SLACK_AUTH_VERSION,
       requestTimestamp,
@@ -39,16 +56,7 @@ export default class AuthenticationGuard implements CanActivate {
       .digest('hex');
 
     const computedSignature = `${AuthenticationGuard.SLACK_AUTH_VERSION}=${hashedString}`;
-
-    return computedSignature === signature;
-  }
-
-  static guardSlackWorkspace(request: SlackRequestDto) {
-    const {
-      body: { team_id },
-    } = request;
-
-    return team_id === process.env.SLACK_TEAM_ID;
+    return computedSignature;
   }
 
   static SLACK_AUTH_VERSION = 'v0';
