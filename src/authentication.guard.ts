@@ -4,7 +4,6 @@ import SlackRequestDto from './dto/slack_request.dto';
 
 @Injectable()
 export default class AuthenticationGuard implements CanActivate {
-  // eslint-disable-next-line class-methods-use-this
   canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest<SlackRequestDto>();
 
