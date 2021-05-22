@@ -41,7 +41,8 @@
       }
     ],
     "no-useless-constructor": "off",
-    "camelcase": "off"
+    "camelcase": "off",
+    "class-methods-use-this": "off"
   },
   "settings": {
     "import/resolver": {

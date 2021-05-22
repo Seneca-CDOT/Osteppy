@@ -1,12 +1,16 @@
+import { INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import AppModule from './app.module';
+import AuthenticationGuard from './authentication.guard';
+import { PORT } from './configuration';
 
-const { PORT } = process.env;
+let app: INestApplication;
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    bodyParser: false, // disabled to use custom body parser
-  });
-  await app.listen(PORT || 3000);
+  app = await NestFactory.create(AppModule);
+  app.useGlobalGuards(new AuthenticationGuard());
+  await app.listen(PORT);
 }
 bootstrap();
+
+export default () => app;

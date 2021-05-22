@@ -3,14 +3,18 @@ import { Document } from 'mongoose';
 
 @Schema()
 export class User extends Document {
-  @Prop()
+  @Prop({ type: String, unique: true, index: true })
   userId = '';
 
   @Prop()
   userName = '';
 
   @Prop()
-  eods: string[] = [];
+  eods: Array<{
+    date: string;
+    text: string;
+    slackResponseUrl: string;
+  }> = [];
 
   @Prop()
   eodStatus = true;

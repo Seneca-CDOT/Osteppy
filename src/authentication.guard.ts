@@ -1,12 +1,13 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { createHmac } from 'crypto';
-import { CommandRequest } from './types/slack';
+import * as formUrlencoded from 'form-urlencoded';
+import { SLACK } from './configuration';
+import SlackRequestDto from './dto/slack_request.dto';
 
 @Injectable()
 export default class AuthenticationGuard implements CanActivate {
-  // eslint-disable-next-line class-methods-use-this
   canActivate(context: ExecutionContext) {
-    const request = context.switchToHttp().getRequest<CommandRequest>();
+    const request = context.switchToHttp().getRequest<SlackRequestDto>();
 
     return (
       AuthenticationGuard.guardSlackCommand(request) &&
@@ -14,41 +15,45 @@ export default class AuthenticationGuard implements CanActivate {
     );
   }
 
-  // Uses signed secrets:
+  // Ensure request is from Slack, using signed secrets:
   // https://api.slack.com/authentication/verifying-requests-from-slack
-  static guardSlackCommand(request: CommandRequest) {
+  static guardSlackCommand(request: SlackRequestDto) {
     const {
       headers: {
         'x-slack-request-timestamp': requestTimestamp,
         'x-slack-signature': signature,
       },
-      rawBody,
+      body,
     } = request;
 
+    const rawBody = formUrlencoded(body);
+    const computedSignature = AuthenticationGuard.computeSlackSignature(
+      requestTimestamp,
+      rawBody,
+    );
+
+    return computedSignature === signature;
+  }
+
+  // Ensure request is from specific workspace
+  static guardSlackWorkspace(request: SlackRequestDto) {
+    const { team_id } = request.body;
+    return team_id === SLACK.TEAM_ID;
+  }
+
+  static computeSlackSignature(requestTimestamp: string, rawBody: string) {
     const baseString = [
       AuthenticationGuard.SLACK_AUTH_VERSION,
       requestTimestamp,
       rawBody,
     ].join(':');
 
-    const hashedString = createHmac(
-      'sha256',
-      process.env.SLACK_SIGNING_SECRET || '',
-    )
+    const hashedString = createHmac('sha256', SLACK.SIGNING_SECRET)
       .update(baseString)
       .digest('hex');
 
     const computedSignature = `${AuthenticationGuard.SLACK_AUTH_VERSION}=${hashedString}`;
-
-    return computedSignature === signature;
-  }
-
-  static guardSlackWorkspace(request: CommandRequest) {
-    const {
-      body: { team_id },
-    } = request;
-
-    return team_id === process.env.SLACK_TEAM_ID;
+    return computedSignature;
   }
 
   static SLACK_AUTH_VERSION = 'v0';
