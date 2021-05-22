@@ -7,6 +7,7 @@ export default class BodyParserMiddleware implements NestMiddleware {
   // Parse while still keep raw body in a different property
   // for later uses such as in authentication guard
   private parser = urlencoded({
+    extended: true,
     verify(req: Request, res: Response, buf: Buffer) {
       Object.defineProperty(req, 'rawBody', {
         value: buf.toString(),
