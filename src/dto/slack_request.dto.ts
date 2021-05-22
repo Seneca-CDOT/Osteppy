@@ -1,5 +1,3 @@
-import SlackRequestBodyDto from './slack_request_body.dto';
-
 export default class SlackRequestDto {
   constructor(
     public headers: {
@@ -7,6 +5,11 @@ export default class SlackRequestDto {
       'x-slack-signature': string;
     },
     public rawBody: string,
-    public body: SlackRequestBodyDto,
+    public body: {
+      text: string;
+      user_id: string;
+      use_name: string;
+      team_id: string;
+    },
   ) {}
 }
