@@ -6,7 +6,6 @@ export default class SlackRequestDto {
       'x-slack-request-timestamp': string;
       'x-slack-signature': string;
     },
-    public rawBody: string,
     public body: {
       text: string;
       user_id: string;

@@ -1,9 +1,8 @@
-import { MiddlewareConsumer, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import AppController from './app.controller';
 import AppService from './app.service';
-import BodyParserMiddleware from './body_parser.middleware';
 import DevModule from './dev/dev.module';
 import { User, UserSchema } from './user/schemas/user.schema';
 
@@ -19,10 +18,6 @@ import { User, UserSchema } from './user/schemas/user.schema';
   controllers: [AppController],
   providers: [AppService],
 })
-class AppModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(BodyParserMiddleware).forRoutes('');
-  }
-}
+class AppModule {}
 
 export default AppModule;

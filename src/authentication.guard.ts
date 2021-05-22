@@ -1,5 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { createHmac } from 'crypto';
+import * as formUrlencoded from 'form-urlencoded';
 import SlackRequestDto from './dto/slack_request.dto';
 
 @Injectable()
@@ -21,9 +22,10 @@ export default class AuthenticationGuard implements CanActivate {
         'x-slack-request-timestamp': requestTimestamp,
         'x-slack-signature': signature,
       },
-      rawBody,
+      body,
     } = request;
 
+    const rawBody = formUrlencoded(body);
     const computedSignature = AuthenticationGuard.computeSlackSignature(
       requestTimestamp,
       rawBody,

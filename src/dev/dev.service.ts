@@ -1,4 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import * as formUrlEncoded from 'form-urlencoded';
 import * as request from 'supertest';
 import AuthenticationGuard from '../authentication.guard';
 import SlackRequestDto from '../dto/slack_request.dto';
@@ -10,12 +11,11 @@ export default class DevService {
     const {
       headers: { 'x-slack-request-timestamp': timestamp },
       body,
-      rawBody,
       originalUrl,
     } = slackRequestDto;
 
     // Extract endpoint from request
-    let [endpoint] = body.text.split('\n');
+    let [endpoint] = body.text.split(/\s/);
     if (endpoint[0] !== '/') endpoint = `/${endpoint}`;
 
     // Prevent circular redirection
@@ -24,7 +24,9 @@ export default class DevService {
     }
 
     // Generate authentication for request body without the endpoint
-    const endRawBody = rawBody.replace(`${endpoint}\n`, '');
+    const endText = body.text.slice(endpoint.length).trim();
+    const endBody = { ...body, text: endText };
+    const endRawBody = formUrlEncoded(endBody);
     const endSlackSignature = AuthenticationGuard.computeSlackSignature(
       timestamp,
       endRawBody,
