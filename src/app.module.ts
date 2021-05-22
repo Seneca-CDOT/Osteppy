@@ -4,16 +4,16 @@ import { MongooseModule } from '@nestjs/mongoose';
 import AppController from './app.controller';
 import AppService from './app.service';
 import DevModule from './dev/dev.module';
-import { User, UserSchema } from './user/schemas/user.schema';
+import UserModule from './user/user.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
     MongooseModule.forRoot(
-      `mongodb://${process.env.MONGO_HOST || 'localhost'}/users`,
+      `mongodb://${process.env.MONGO_HOST || 'localhost'}/osteppy`,
     ),
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     DevModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
