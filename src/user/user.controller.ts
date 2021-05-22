@@ -23,7 +23,7 @@ export default class UserController {
   @Post('find-one')
   findOne(@Req() slackRequestDto: SlackRequestDto) {
     const { text } = slackRequestDto.body;
-    const userId = text.match(/<@(\w+)[^>]*>/)?.[1];
+    const userId = text.match(/(<@)?(\w+)/)?.[2];
     return this.userService.findOne(userId);
   }
 
