@@ -8,8 +8,8 @@ export const PORT = env.PORT || 3000;
 
 export const MONGO = {
   HOST: env.MONGO_HOST || 'localhost',
-  USER: env.MONGO_USER || 'admin',
-  PASS: env.MONGO_PASS || 'admin',
+  USER: env.MONGO_USER,
+  PASS: env.MONGO_PASS,
 } as const;
 
 export const SLACK = {
