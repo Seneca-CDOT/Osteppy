@@ -5,8 +5,7 @@ import AppController from './app.controller';
 import AppService from './app.service';
 import BodyParserMiddleware from './body_parser.middleware';
 import DevModule from './dev/dev.module';
-import { User, UserSchema } from './Users/schemas/user.schema';
-import UserService from './Users/users.service';
+import { User, UserSchema } from './user/schemas/user.schema';
 
 @Module({
   imports: [
@@ -18,7 +17,7 @@ import UserService from './Users/users.service';
     DevModule,
   ],
   controllers: [AppController],
-  providers: [AppService, UserService],
+  providers: [AppService],
 })
 class AppModule {
   configure(consumer: MiddlewareConsumer) {
