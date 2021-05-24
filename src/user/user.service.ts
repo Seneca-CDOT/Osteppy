@@ -5,10 +5,10 @@ import { User } from './schemas/user.schema';
 
 @Injectable()
 export default class UserService {
-  constructor(@InjectModel(User.name) private UserModel: Model<User>) {}
+  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
   async create(userId: string, userName: string) {
-    const newUser = await this.UserModel.create({
+    const newUser = await this.userModel.create({
       userId,
       userName,
       eods: [],
@@ -18,14 +18,14 @@ export default class UserService {
   }
 
   findAll() {
-    return this.UserModel.find().exec();
+    return this.userModel.find().exec();
   }
 
   findOne(userId?: string) {
-    return this.UserModel.findOne({ userId }).exec();
+    return this.userModel.findOne({ userId }).exec();
   }
 
   deleteAll() {
-    return this.UserModel.deleteMany({}).exec();
+    return this.userModel.deleteMany({}).exec();
   }
 }
