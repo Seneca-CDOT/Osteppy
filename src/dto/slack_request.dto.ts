@@ -9,7 +9,7 @@ export default class SlackRequestDto {
     public body: {
       text: string;
       user_id: string;
-      use_name: string;
+      user_name: string;
       team_id: string;
     },
     // Express Request properties
