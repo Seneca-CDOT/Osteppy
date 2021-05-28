@@ -1,24 +1,31 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { createSlackResponseDto } from '../dto/create_slack_response_dto';
+import { HttpService, Injectable, Logger } from '@nestjs/common';
 import SlackRequestDto from '../dto/slack_request.dto';
-import { CurrentEod, Eod } from '../user/schemas/user.schema';
+import SlackResponseDto from '../dto/slack_response.dto';
+import { Eod } from '../user/schemas/user.schema';
 import UserService from '../user/user.service';
 
 @Injectable()
 export default class EodService {
   private readonly logger = new Logger(EodService.name);
 
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly userService: UserService,
+  ) {}
 
   async getCurrentOrSubmit(slackRequestDto: SlackRequestDto) {
     const { user_id, user_name, text, response_url } = slackRequestDto.body;
 
     return text
-      ? this.submit(user_id, user_name, text, response_url)
-      : this.getCurrent(user_id, user_name);
+      ? this.submit(response_url, user_id, user_name, text)
+      : this.getCurrent(response_url, user_id, user_name);
   }
 
-  private async getCurrent(userId: string, username: string) {
+  private async getCurrent(
+    slackResponseUrl: string,
+    userId: string,
+    username: string,
+  ) {
     this.logger.log(`${username}'s getting current EOD`);
 
     const { currentEod } = await this.userService.userModel
@@ -33,26 +40,27 @@ export default class EodService {
       )
       .exec();
 
-    return createSlackResponseDto(
-      currentEod
+    const slackResponseDto: SlackResponseDto = {
+      text: currentEod
         ? EodService.format(username, currentEod)
         : "You haven't submitted EOD for today yet",
-    );
+    };
+
+    this.httpService.post(slackResponseUrl, slackResponseDto).subscribe();
   }
 
   // Submit EOD; update if existing
   private async submit(
+    slackResponseUrl: string,
     userId: string,
     username: string,
     eodText: string,
-    slackResponseUrl: string,
   ) {
     this.logger.log(`${username}'s submitting EOD`);
 
-    const currentEod: CurrentEod = {
+    const currentEod: Eod = {
       date: new Date().getTime(),
       text: eodText,
-      slackResponseUrl,
     };
 
     await this.userService.userModel.updateOne(
@@ -61,9 +69,12 @@ export default class EodService {
       { upsert: true },
     );
 
-    // TODO: remove old message using slack response_url
+    const slackResponseDto: SlackResponseDto = {
+      response_type: 'in_channel',
+      text: EodService.format(username, currentEod),
+    };
 
-    return createSlackResponseDto(EodService.format(username, currentEod));
+    this.httpService.post(slackResponseUrl, slackResponseDto).subscribe();
   }
 
   static format(username: string, eod: Eod) {

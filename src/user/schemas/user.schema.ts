@@ -6,10 +6,6 @@ export type Eod = {
   text: string;
 };
 
-export type CurrentEod = Eod & {
-  slackResponseUrl: string;
-};
-
 @Schema()
 export class User extends Document {
   @Prop({ type: String, unique: true, index: true })
@@ -22,7 +18,7 @@ export class User extends Document {
   eods: Eod[] = [];
 
   @Prop()
-  currentEod?: CurrentEod;
+  currentEod?: Eod;
 
   @Prop()
   eodStatus = true;

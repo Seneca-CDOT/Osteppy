@@ -3,6 +3,8 @@ import SlackBlockSectionDto from './slack_block_section.dto';
 
 export default class SlackResponseDto {
   constructor(
-    public blocks: Array<SlackBlockSectionDto | SlackBlockDividerDto>,
+    public response_type?: 'ephemeral' | 'in_channel',
+    public text?: string,
+    public blocks?: (SlackBlockSectionDto | SlackBlockDividerDto)[],
   ) {}
 }

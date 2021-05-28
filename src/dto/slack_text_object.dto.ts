@@ -1,5 +1,3 @@
 export default class SlackTextObjectDto {
-  readonly type = 'mrkdwn';
-
-  constructor(public text: string) {}
+  constructor(public type: 'plain_text' | 'mrkdwn', public text: string) {}
 }
