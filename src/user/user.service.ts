@@ -5,12 +5,12 @@ import { User } from './schemas/user.schema';
 
 @Injectable()
 export default class UserService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor(@InjectModel(User.name) public readonly userModel: Model<User>) {}
 
-  async create(userId: string, userName: string) {
+  async create(userId: string, username: string) {
     const newUser = await this.userModel.create({
       userId,
-      userName,
+      username,
       eods: [],
       eodStatus: true,
     });
