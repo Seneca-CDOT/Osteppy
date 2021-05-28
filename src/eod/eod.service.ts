@@ -1,4 +1,5 @@
 import { HttpService, Injectable, Logger } from '@nestjs/common';
+import { scheduleJob } from 'node-schedule';
 import SlackRequestDto from '../dto/slack_request.dto';
 import SlackResponseDto from '../dto/slack_response.dto';
 import { Eod } from '../user/schemas/user.schema';
@@ -11,7 +12,36 @@ export default class EodService {
   constructor(
     private readonly httpService: HttpService,
     private readonly userService: UserService,
-  ) {}
+  ) {
+    scheduleJob('0 0 0 * * *', () => this.archiveAllCurrent());
+  }
+
+  // Put into record the current EODs of all users
+  private async archiveAllCurrent() {
+    this.logger.log("Archiving all users' current EODs");
+
+    const users = await this.userService.userModel
+      .find({}, 'userId currentEod')
+      .exec();
+
+    const archiveCurrentsPromises = users.map(async (user) => {
+      const { username, currentEod } = user;
+
+      if (currentEod) {
+        await user
+          .updateOne({
+            $push: { eods: currentEod },
+            currentEod: undefined,
+          })
+          .exec();
+
+        this.logger.log(`Archived ${username}'s current EOD`);
+      }
+    });
+
+    Promise.all(archiveCurrentsPromises);
+    this.logger.log("Archived all users' current EODs");
+  }
 
   async getCurrentOrSubmit(slackRequestDto: SlackRequestDto) {
     const { user_id, user_name, text, response_url } = slackRequestDto.body;
