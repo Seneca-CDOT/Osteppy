@@ -8,6 +8,6 @@ export default class EodController {
 
   @Post('get-current-or-submit')
   getCurrentOrSubmit(@Request() slackRequestDto: SlackRequestDto) {
-    return this.eodService.getCurrentOrSubmit(slackRequestDto);
+    this.eodService.getCurrentOrSubmitEod(slackRequestDto);
   }
 }
