@@ -10,6 +10,8 @@ services:
       - MONGO_PASS
       - PORT
       - MONGO_HOST
+      - SLACK_SIGNING_SECRET
+      - SLACK_TEAM_ID
     ports:
       - ${PORT}:${PORT}
     depends_on:
