@@ -7,7 +7,7 @@ export default class EodController {
   constructor(private readonly eodService: EodService) {}
 
   @Post('get-current-or-submit')
-  getCurrentOrSubmit(@Request() slackRequestDto: SlackRequestDto) {
+  getCurrentOrSubmitEod(@Request() slackRequestDto: SlackRequestDto) {
     this.eodService.getCurrentOrSubmitEod(slackRequestDto);
   }
 }

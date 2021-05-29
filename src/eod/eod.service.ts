@@ -49,16 +49,25 @@ export default class EodService {
   async getCurrentOrSubmitEod(slackRequestDto: SlackRequestDto) {
     const { user_id, user_name, text, response_url } = slackRequestDto.body;
 
-    return text
-      ? this.submitEod(response_url, user_id, user_name, text)
-      : this.getCurrentEod(response_url, user_id, user_name);
+    let slackResponseDto: SlackResponseDto;
+
+    if (text === 'help') {
+      slackResponseDto = {
+        text: EodService.CMD_HELP_GET_CURRENT_OR_SUBMIT_EOD,
+      };
+    } else if (text) {
+      slackResponseDto = await this.submitEod(user_id, user_name, text);
+    } else {
+      slackResponseDto = await this.getCurrentEod(user_id, user_name);
+    }
+
+    this.httpService.post(response_url, slackResponseDto).subscribe();
   }
 
   private async getCurrentEod(
-    slackResponseUrl: string,
     userId: string,
     username: string,
-  ) {
+  ): Promise<SlackResponseDto> {
     this.logger.log(`${username}'s getting current EOD`);
 
     const { currentEod } = await this.userService.userModel
@@ -73,22 +82,19 @@ export default class EodService {
       )
       .exec();
 
-    const slackResponseDto: SlackResponseDto = {
+    return {
       text: currentEod
         ? EodService.formatEod(userId, currentEod)
         : "You haven't submitted EOD for today yet",
     };
-
-    this.httpService.post(slackResponseUrl, slackResponseDto).subscribe();
   }
 
   // Submit EOD; update if existing
   private async submitEod(
-    slackResponseUrl: string,
     userId: string,
     username: string,
     text: string,
-  ) {
+  ): Promise<SlackResponseDto> {
     this.logger.log(`${username}'s submitting EOD`);
 
     const currentEod: Eod = {
@@ -102,12 +108,10 @@ export default class EodService {
       { upsert: true },
     );
 
-    const slackResponseDto = {
+    return {
       response_type: 'in_channel',
       text: EodService.formatEod(userId, currentEod),
     };
-
-    this.httpService.post(slackResponseUrl, slackResponseDto).subscribe();
   }
 
   // Format EOD; return null if invalid syntax
@@ -127,4 +131,14 @@ export default class EodService {
   }
 
   static DEFAULT_EMOJI = ':checkered_flag:';
+
+  static CMD_HELP_GET_CURRENT_OR_SUBMIT_EOD = `\`\`\`
+# Print today EOD
+  /eod
+  
+# Submit/update today EOD
+  /eod [:emoji:]
+  - task1
+  - task2
+  - task2\`\`\``;
 }
