@@ -6,6 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     environment:
+      - TZ
       - MONGO_USER
       - MONGO_PASS
       - PORT
