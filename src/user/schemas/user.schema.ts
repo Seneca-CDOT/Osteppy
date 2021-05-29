@@ -1,20 +1,24 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
+export type Eod = {
+  date: number;
+  text: string;
+};
+
 @Schema()
 export class User extends Document {
   @Prop({ type: String, unique: true, index: true })
   userId = '';
 
   @Prop()
-  userName = '';
+  username = '';
 
   @Prop()
-  eods: Array<{
-    date: string;
-    text: string;
-    slackResponseUrl: string;
-  }> = [];
+  eods: Eod[] = [];
+
+  @Prop()
+  currentEod?: Eod;
 
   @Prop()
   eodStatus = true;

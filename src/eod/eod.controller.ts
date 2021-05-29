@@ -1,12 +1,13 @@
-import { Controller, Post } from '@nestjs/common';
+import { Controller, Post, Request } from '@nestjs/common';
+import SlackRequestDto from '../dto/slack_request.dto';
 import EodService from './eod.service';
 
 @Controller('eod')
 export default class EodController {
-  constructor(private eodService: EodService) {}
+  constructor(private readonly eodService: EodService) {}
 
-  @Post('create')
-  create() {
-    return this.eodService.create();
+  @Post('get-current-or-submit')
+  getCurrentOrSubmitEod(@Request() slackRequestDto: SlackRequestDto) {
+    this.eodService.getCurrentOrSubmitEod(slackRequestDto);
   }
 }
