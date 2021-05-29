@@ -114,18 +114,19 @@ export default class EodService {
     };
   }
 
-  // Format EOD; return null if invalid syntax
   static formatEod(userId: string, eod: Eod) {
     const { text, date } = eod;
-    const regex = /[^:\n]*(:[^:\n]+:)?[^\n]*\n?(.*)/s;
+
+    const regex = /[^:]*(:.*:)?(.*)/s;
 
     const tokens = text.match(regex);
     const emoji = tokens?.[1] || EodService.DEFAULT_EMOJI;
-    const tasks = `>${tokens?.[2]?.replace(/\n/g, '\n>')}`;
+    const tasks = tokens?.[1] ? tokens[2] : tokens?.[0];
 
+    const formattedTasks = `>${tasks?.trim()?.replace(/\n/g, '\n>')}`;
     const formattedDate = `<!date^${date}^{date_num}| >`;
     const header = `${emoji} EOD was submitted by <@${userId}> on ${formattedDate}`;
-    const formattedText = `${header}\n${tasks}`;
+    const formattedText = `${header}\n${formattedTasks}`;
 
     return formattedText;
   }
