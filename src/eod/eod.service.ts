@@ -138,8 +138,8 @@ export default class EodService {
   /eod
   
 # Submit/update today EOD
-  /eod [:emoji:]
+  /eod :emoji: (optional)
   - task1
   - task2
-  - task2\`\`\``;
+  - task3\`\`\``;
 }
