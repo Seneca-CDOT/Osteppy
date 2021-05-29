@@ -22,7 +22,7 @@ export default class EodService {
     this.logger.log("Archiving all users' current EODs");
 
     const users = await this.userService.userModel
-      .find({}, 'userId currentEod')
+      .find({}, 'userId username currentEod')
       .exec();
 
     const archivingPromise = users.map(async (user) => {
@@ -40,7 +40,7 @@ export default class EodService {
       }
     });
 
-    Promise.all(archivingPromise);
+    await Promise.all(archivingPromise);
     this.logger.log("Archived all users' current EODs");
   }
 
