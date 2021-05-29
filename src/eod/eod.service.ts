@@ -131,7 +131,7 @@ export default class EodService {
     return formattedText;
   }
 
-  static DEFAULT_EMOJI = ':checkered_flag:';
+  static DEFAULT_EMOJI = ':clock5:';
 
   static CMD_HELP_GET_CURRENT_OR_SUBMIT_EOD = `\`\`\`
 # Print today EOD
