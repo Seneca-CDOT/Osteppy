@@ -117,7 +117,7 @@ export default class EodService {
   static formatEod(userId: string, eod: Eod) {
     const { text, date } = eod;
 
-    const regex = /[^:]*(:.*:)?(.*)/s;
+    const regex = /[^:]*(:[^\s]*:)?(.*)/s;
 
     const tokens = text.match(regex);
     const emoji = tokens?.[1] || EodService.DEFAULT_EMOJI;
