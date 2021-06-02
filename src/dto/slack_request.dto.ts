@@ -12,6 +12,7 @@ export default class SlackRequestDto {
       user_name: string;
       team_id: string;
       response_url: string;
+      channel_id: string;
     },
     // Express Request properties
     public originalUrl: Request['originalUrl'],

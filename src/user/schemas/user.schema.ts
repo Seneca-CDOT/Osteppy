@@ -4,6 +4,10 @@ import { Document } from 'mongoose';
 export type Eod = {
   date: number;
   text: string;
+  message?: {
+    channelId: string;
+    timestamp: string;
+  };
 };
 
 @Schema()

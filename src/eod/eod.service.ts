@@ -1,7 +1,7 @@
-import { HttpService, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { scheduleJob } from 'node-schedule';
 import SlackRequestDto from '../dto/slack_request.dto';
-import SlackResponseDto from '../dto/slack_response.dto';
+import SlackService from '../slack/slack.service';
 import { Eod } from '../user/schemas/user.schema';
 import UserService from '../user/user.service';
 
@@ -10,7 +10,7 @@ export default class EodService {
   private readonly logger = new Logger(EodService.name);
 
   constructor(
-    private readonly httpService: HttpService,
+    private readonly slackService: SlackService,
     private readonly userService: UserService,
   ) {
     // Archive all current EODs at midnight
@@ -44,57 +44,56 @@ export default class EodService {
     this.logger.log("Archived all users' current EODs");
   }
 
-  // If Slack command has content, submit EOD with that
-  // content, else return the current EOD
+  // Get info of or submit/update the current EOD of the day
   async getCurrentOrSubmitEod(slackRequestDto: SlackRequestDto) {
-    const { user_id, user_name, text, response_url } = slackRequestDto.body;
-
-    let slackResponseDto: SlackResponseDto;
+    const { user_id, user_name, text, channel_id } = slackRequestDto.body;
 
     if (text === 'help') {
-      slackResponseDto = {
+      this.slackService.web.chat.postEphemeral({
+        user: user_id,
+        channel: channel_id,
         text: EodService.CMD_HELP_GET_CURRENT_OR_SUBMIT_EOD,
-      };
+      });
     } else if (text) {
-      slackResponseDto = await this.submitEod(user_id, user_name, text);
+      this.submitEod(user_id, user_name, channel_id, text);
     } else {
-      slackResponseDto = await this.getCurrentEod(user_id, user_name);
+      this.getCurrentEod(user_id, user_name, channel_id);
     }
-
-    this.httpService.post(response_url, slackResponseDto).subscribe();
   }
 
   private async getCurrentEod(
     userId: string,
     username: string,
-  ): Promise<SlackResponseDto> {
+    channelId: string,
+  ) {
     this.logger.log(`${username}'s getting current EOD`);
 
+    // Get current EOD from database; create new user if not exist
     const { currentEod } = await this.userService.userModel
       .findOneAndUpdate(
         { userId },
         { username },
-        {
-          new: true,
-          upsert: true,
-          fields: 'currentEod',
-        },
+        { new: true, upsert: true, fields: 'currentEod' },
       )
       .exec();
 
-    return {
+    // Post private EOD message to Slack
+    this.slackService.web.chat.postEphemeral({
+      user: userId,
+      channel: channelId,
       text: currentEod
         ? EodService.formatEod(userId, currentEod)
         : "You haven't submitted EOD for today yet",
-    };
+    });
   }
 
   // Submit EOD; update if existing
   private async submitEod(
     userId: string,
     username: string,
+    channelId: string,
     text: string,
-  ): Promise<SlackResponseDto> {
+  ) {
     this.logger.log(`${username}'s submitting EOD`);
 
     const currentEod: Eod = {
@@ -102,16 +101,34 @@ export default class EodService {
       text,
     };
 
-    await this.userService.userModel.updateOne(
-      { userId },
-      { username, currentEod },
-      { upsert: true },
-    );
-
-    return {
-      response_type: 'in_channel',
+    // Post EOD message to Slack
+    const { ts: timestamp } = await this.slackService.web.chat.postMessage({
+      channel: channelId,
       text: EodService.formatEod(userId, currentEod),
-    };
+    });
+
+    // If EOD message is sucessfully posted, store it for later deletion
+    if (timestamp) {
+      currentEod.message = { channelId, timestamp };
+    }
+
+    // Create/update user database with new current EOD
+    const oldUser = await this.userService.userModel
+      .findOneAndUpdate(
+        { userId },
+        { username, currentEod },
+        { upsert: true, fields: 'currentEod' },
+      )
+      .exec();
+
+    // Delete old EOD message if exists
+    const oldEodMessage = oldUser?.currentEod?.message;
+    if (oldEodMessage) {
+      this.slackService.web.chat.delete({
+        channel: oldEodMessage.channelId,
+        ts: oldEodMessage.timestamp,
+      });
+    }
   }
 
   static formatEod(userId: string, eod: Eod) {
