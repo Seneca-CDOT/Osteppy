@@ -12,7 +12,7 @@ export class User {
   @Prop({ type: String, required: true })
   slackUsername!: string;
 
-  @Prop({ type: [EodSchemaDefinition] })
+  @Prop({ type: [EodSchemaDefinition], required: true, default: [] })
   eods!: Eod[];
 
   @Prop({ type: EodSchemaDefinition })

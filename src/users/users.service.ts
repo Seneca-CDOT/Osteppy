@@ -19,22 +19,19 @@ export default class UsersService {
     return this.userModel.deleteMany({}).exec();
   }
 
-  create(slackUserId: string, slackUsername: string) {
-    this.logger.log(`Create user [${slackUserId}]`);
-    return this.userModel.create({
-      slackUserId,
-      slackUsername,
-      eods: [],
-    });
-  }
-
   find(slackUserId: string) {
     this.logger.log(`Find user [${slackUserId}]`);
     return this.userModel.findOne({ slackUserId }).exec();
   }
 
-  update(slackUserId: string, slackUsername: string) {
-    this.logger.log(`Update user [${slackUserId}]`);
-    return this.userModel.updateOne({ slackUserId }, { slackUsername });
+  createOrUpdate(slackUserId: string, slackUsername: string) {
+    this.logger.log(`Create or update user [${slackUserId}]`);
+    return this.userModel
+      .findOneAndUpdate(
+        { slackUserId },
+        { slackUsername },
+        { new: true, upsert: true, setDefaultsOnInsert: true },
+      )
+      .exec();
   }
 }
