@@ -1,21 +1,11 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
 import AppController from './app.controller';
 import AppService from './app.service';
-import { MONGO } from './configuration';
+import { DatabaseModule } from './database/database.module';
 import UsersModule from './users/users.module';
 
 @Module({
-  imports: [
-    MongooseModule.forRoot(`mongodb://${MONGO.HOST}`, {
-      dbName: 'osteppy',
-      user: MONGO.USER,
-      pass: MONGO.PASS,
-      useFindAndModify: false,
-      useCreateIndex: true,
-    }),
-    UsersModule,
-  ],
+  imports: [DatabaseModule, UsersModule],
   controllers: [AppController],
   providers: [AppService],
 })
