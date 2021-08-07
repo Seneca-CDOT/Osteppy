@@ -2,53 +2,47 @@ import {
   createMockDatabaseTestingModule,
   MockDatabaseTestingModule,
 } from '../database/mock_database_testing.module';
-import UsersController from './users.controller';
 import UsersModule from './users.module';
+import UsersService from './users.service';
 
-describe('UsersController', () => {
+describe('UsersService', () => {
   let testingModule: MockDatabaseTestingModule;
-  let usersController: UsersController;
+  let usersService: UsersService;
 
   beforeEach(async () => {
     testingModule = await createMockDatabaseTestingModule([UsersModule]);
-    usersController = testingModule.get(UsersController);
+    usersService = testingModule.get(UsersService);
   });
 
   test('find all users', async () => {
-    expect((await usersController.findAll()).length).toBe(0);
+    expect((await usersService.findAll()).length).toBe(0);
 
-    await usersController.createOrUpdate('123', { slackUsername: 'foo' });
-    expect((await usersController.findAll()).length).toBe(1);
+    await usersService.createOrUpdate('123', 'foo');
+    expect((await usersService.findAll()).length).toBe(1);
   });
 
   test('delete all users', async () => {
-    await usersController.createOrUpdate('123', { slackUsername: 'foo' });
-    const result = await usersController.deleteAll();
+    await usersService.createOrUpdate('123', 'foo');
+    const result = await usersService.deleteAll();
     expect(result.deletedCount).toBe(1);
   });
 
   test('create or update user', async () => {
-    let user = await usersController.createOrUpdate('123', {
-      slackUsername: 'foo',
-    });
+    let user = await usersService.createOrUpdate('123', 'foo');
     expect(user.slackUserId).toBe('123');
     expect(user.slackUsername).toBe('foo');
 
-    user = await usersController.createOrUpdate('123', {
-      slackUsername: 'bar',
-    });
+    user = await usersService.createOrUpdate('123', 'bar');
     expect(user.slackUserId).toBe('123');
     expect(user.slackUsername).toBe('bar');
   });
 
   test('find user', async () => {
-    let user = await usersController.find('123');
+    let user = await usersService.find('123');
     expect(user).toBe(null);
 
-    await usersController.createOrUpdate('123', {
-      slackUsername: 'foo',
-    });
-    user = await usersController.find('123');
+    await usersService.createOrUpdate('123', 'foo');
+    user = await usersService.find('123');
     expect(user?.slackUserId).toBe('123');
     expect(user?.slackUsername).toBe('foo');
   });
