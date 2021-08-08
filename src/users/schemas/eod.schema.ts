@@ -1,13 +1,13 @@
 import { SchemaDefinition } from 'mongoose';
 
 export type Eod = {
-  date: number;
+  date: Date;
   tasks: string[];
-  slackEmoji?: string;
+  slackEmoji: string;
 };
 
 export const EodSchemaDefinition: SchemaDefinition = {
-  date: { type: Number, required: true },
-  tasks: { type: [String], required: true },
+  date: { type: Date },
+  tasks: { type: [String] },
   slackEmoji: { type: String },
 };

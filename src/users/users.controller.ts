@@ -1,5 +1,4 @@
 import { Body, Controller, Delete, Get, Param, Patch } from '@nestjs/common';
-import CreateOrUpdateUserDto from './dto/create_or_update_user.dto';
 import UsersService from './users.service';
 
 @Controller('users')
@@ -21,12 +20,19 @@ export default class UsersController {
     return this.usersService.find(slackUserId);
   }
 
-  @Patch(':slackUserId')
-  createOrUpdate(
+  @Patch(':slackUserId/eod/tasks/push-many')
+  pushEodTasks(
     @Param('slackUserId') slackUserId: string,
-    @Body() createOrUpdateUserDto: CreateOrUpdateUserDto,
+    @Body('tasks') tasks: string[],
   ) {
-    const { slackUsername } = createOrUpdateUserDto;
-    return this.usersService.createOrUpdate(slackUserId, slackUsername);
+    return this.usersService.pushEodTasks(slackUserId, tasks);
+  }
+
+  @Patch(':slackUserId/eod/tasks/pop-many')
+  popEodTask(
+    @Param('slackUserId') slackUserId: string,
+    @Body('numTasks') numTasks: number,
+  ) {
+    return this.usersService.popEodTasks(slackUserId, numTasks);
   }
 }

@@ -9,14 +9,14 @@ export class User {
   @Prop({ type: String, index: { unique: true } })
   slackUserId!: string;
 
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, default: '' })
   slackUsername!: string;
 
-  @Prop({ type: [EodSchemaDefinition], required: true, default: [] })
+  @Prop({ type: [EodSchemaDefinition], default: [] })
   eods!: Eod[];
 
-  @Prop({ type: EodSchemaDefinition })
-  currentEod?: Eod;
+  @Prop({ type: EodSchemaDefinition, default: null })
+  eod!: Eod | null;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
