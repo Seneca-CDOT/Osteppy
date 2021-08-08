@@ -1,9 +1,13 @@
 import { Body, Controller, Delete, Get, Param, Patch } from '@nestjs/common';
 import UsersService from './users.service';
+import UserEodsService from './user_eods.service';
 
 @Controller('users')
 export default class UsersController {
-  constructor(private usersService: UsersService) {}
+  constructor(
+    private usersService: UsersService,
+    private userEodsService: UserEodsService,
+  ) {}
 
   @Get()
   findAll() {
@@ -25,7 +29,7 @@ export default class UsersController {
     @Param('slackUserId') slackUserId: string,
     @Body('tasks') tasks: string[],
   ) {
-    return this.usersService.pushEodTasks(slackUserId, tasks);
+    return this.userEodsService.pushEodTasks(slackUserId, tasks);
   }
 
   @Patch(':slackUserId/eod/tasks/pop-many')
@@ -33,6 +37,6 @@ export default class UsersController {
     @Param('slackUserId') slackUserId: string,
     @Body('numTasks') numTasks: number,
   ) {
-    return this.usersService.popEodTasks(slackUserId, numTasks);
+    return this.userEodsService.popEodTasks(slackUserId, numTasks);
   }
 }
