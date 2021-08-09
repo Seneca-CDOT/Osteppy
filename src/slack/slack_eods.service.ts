@@ -15,7 +15,7 @@ export default class SlackEodsService {
       if (trimmed) lines.push(trimmed);
     });
 
-    const slackEmoji = lines[0].match(/^:\w+:$/)?.[0];
+    const slackEmoji = lines[0]?.match(/^:[\w-]+:$/)?.[0];
     if (slackEmoji) lines.shift();
     const tasks = lines.length ? lines : undefined;
 

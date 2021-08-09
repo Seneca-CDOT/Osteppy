@@ -13,6 +13,10 @@ describe('SlackEodsService', () => {
     const eod3 = SlackEodsService.parseEodFromText(`:foo:`);
     expect(eod3.tasks).toBeUndefined();
     expect(eod3.slackEmoji).toBe(':foo:');
+
+    const eod4 = SlackEodsService.parseEodFromText('');
+    expect(eod4.tasks).toBeUndefined();
+    expect(eod4.slackEmoji).toBeUndefined();
   });
 
   test('format EOD to text', () => {
