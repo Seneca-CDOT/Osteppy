@@ -7,7 +7,7 @@ export type Eod = {
 };
 
 export const EodSchemaDefinition: SchemaDefinition = {
-  date: { type: Date },
-  tasks: { type: [String] },
-  slackEmoji: { type: String },
+  date: { type: Date, default: new Date(0) },
+  tasks: [String],
+  slackEmoji: { type: String, default: '' },
 };

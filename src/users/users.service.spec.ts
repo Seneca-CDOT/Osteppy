@@ -18,7 +18,7 @@ describe('UsersService', () => {
     let users = await usersService.findAll();
     expect(users.length).toBe(0);
 
-    await usersService.create('123', 'foo');
+    await usersService.findOrCreate('123');
     users = await usersService.findAll();
     expect(users.length).toBe(1);
   });
@@ -27,7 +27,7 @@ describe('UsersService', () => {
     let result = await usersService.deleteAll();
     expect(result.deletedCount).toBe(0);
 
-    await usersService.create('123', 'foo');
+    await usersService.findOrCreate('123');
     result = await usersService.deleteAll();
     expect(result.deletedCount).toBe(1);
   });
@@ -36,16 +36,25 @@ describe('UsersService', () => {
     let user = await usersService.find('123');
     expect(user).toBe(null);
 
-    await usersService.create('123', 'foo');
+    await usersService.findOrCreate('123');
     user = await usersService.find('123');
     expect(user?.slackUserId).toBe('123');
-    expect(user?.slackUsername).toBe('foo');
   });
 
-  test('create', async () => {
-    const user = await usersService.create('123', 'foo');
-    expect(user.slackUserId).toBe('123');
-    expect(user.slackUsername).toBe('foo');
+  test('find or create', async () => {
+    const user = await usersService.findOrCreate('123');
+    expect(user).toEqual(
+      expect.objectContaining({
+        slackUserId: '123',
+        slackUsername: '',
+        eods: [],
+        eod: {
+          date: new Date(0),
+          tasks: [],
+          slackEmoji: '',
+        },
+      }),
+    );
   });
 
   afterEach(async () => {

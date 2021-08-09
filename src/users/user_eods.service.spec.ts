@@ -15,13 +15,31 @@ describe('UserEodsService', () => {
   });
 
   test('update EOD', async () => {
-    const eod = await userEodsService.updateEod('123', ['foo'], ':bar:');
+    let eod = await userEodsService.updateEod('123', {
+      tasks: ['foo'],
+      slackEmoji: ':bar:',
+    });
     expect(eod.tasks).toEqual(['foo']);
     expect(eod.slackEmoji).toEqual(':bar:');
+
+    eod = await userEodsService.updateEod('123', {
+      tasks: ['bar'],
+    });
+    expect(eod.tasks).toEqual(['bar']);
+    expect(eod.slackEmoji).toEqual(':bar:');
+
+    eod = await userEodsService.updateEod('123', {
+      slackEmoji: ':foo:',
+    });
+    expect(eod.tasks).toEqual(['bar']);
+    expect(eod.slackEmoji).toEqual(':foo:');
   });
 
   test('push EOD tasks', async () => {
     let eod = await userEodsService.pushEodTasks('123', ['foo']);
+    expect(eod.tasks).toEqual(['foo']);
+
+    eod = await userEodsService.pushEodTasks('123');
     expect(eod.tasks).toEqual(['foo']);
 
     eod = await userEodsService.pushEodTasks('123', ['bar', 'baz']);
@@ -36,16 +54,11 @@ describe('UserEodsService', () => {
     eod = await userEodsService.popEodTasks('123', 1);
     expect(eod.tasks).toEqual(['foo', 'bar']);
 
+    eod = await userEodsService.popEodTasks('123');
+    expect(eod.tasks).toEqual(['foo', 'bar']);
+
     eod = await userEodsService.popEodTasks('123', 10);
     expect(eod.tasks).toEqual([]);
-  });
-
-  test('update EOD Slack emoji', async () => {
-    let eod = await userEodsService.updateEodSlackEmoji('123', ':foo:');
-    expect(eod.slackEmoji).toBe(':foo:');
-
-    eod = await userEodsService.updateEodSlackEmoji('123', ':bar:');
-    expect(eod.slackEmoji).toBe(':bar:');
   });
 
   afterEach(async () => {

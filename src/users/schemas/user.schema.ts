@@ -1,8 +1,8 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { MongooseDocument } from '../../helpers/mongoose_document';
 import { Eod, EodSchemaDefinition } from './eod.schema';
 
-export type UserDocument = User & Document;
+export type UserDocument = MongooseDocument<User>;
 
 @Schema()
 export class User {
@@ -12,11 +12,11 @@ export class User {
   @Prop({ type: String, default: '' })
   slackUsername!: string;
 
-  @Prop({ type: [EodSchemaDefinition], default: [] })
+  @Prop(raw([EodSchemaDefinition]))
   eods!: Eod[];
 
-  @Prop({ type: EodSchemaDefinition, default: null })
-  eod!: Eod | null;
+  @Prop(raw(EodSchemaDefinition))
+  eod!: Eod;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
