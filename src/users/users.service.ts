@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { assignDefined } from '../helpers/assign_defined';
 import { User, UserDocument } from './schemas/user.schema';
 
 @Injectable()
@@ -8,6 +9,16 @@ export default class UsersService {
   private logger = new Logger(UsersService.name);
 
   constructor(@InjectModel(User.name) public userModel: Model<UserDocument>) {}
+
+  async #findOrCreate(slackUserId: string, lean = false) {
+    return this.userModel
+      .findOneAndUpdate(
+        { slackUserId },
+        {},
+        { upsert: true, new: true, setDefaultsOnInsert: true, lean },
+      )
+      .exec();
+  }
 
   async findAll() {
     this.logger.log('Find all users');
@@ -24,17 +35,61 @@ export default class UsersService {
     return this.userModel.findOne({ slackUserId }).lean();
   }
 
-  async findOrCreate(slackUserId: string, pojo?: true): Promise<User>;
+  async findOrCreate(slackUserId: string): Promise<User> {
+    return this.#findOrCreate(slackUserId, true);
+  }
 
-  async findOrCreate(slackUserId: string, pojo: false): Promise<UserDocument>;
+  async updateEod(
+    slackUserId: string,
+    eodFields?: {
+      tasks?: string[];
+      slackEmoji?: string;
+    },
+    userFields?: {
+      slackUsername?: string;
+    },
+  ) {
+    this.logger.log(`Update EOD for user [${slackUserId}]`);
 
-  async findOrCreate(slackUserId: string, pojo = true) {
-    return this.userModel
-      .findOneAndUpdate(
-        { slackUserId },
-        {},
-        { upsert: true, new: true, setDefaultsOnInsert: true, lean: pojo },
-      )
-      .exec();
+    const userDoc = await this.#findOrCreate(slackUserId);
+    assignDefined(userDoc.eod, eodFields);
+    assignDefined(userDoc, userFields);
+    await userDoc.save();
+
+    return userDoc.toObject().eod;
+  }
+
+  async pushEodTasks(
+    slackUserId: string,
+    tasks: string[] = [],
+    userFields?: {
+      slackUsername?: string;
+    },
+  ) {
+    this.logger.log(`Push EOD tasks for user [${slackUserId}]`);
+
+    const user = await this.#findOrCreate(slackUserId, false);
+    user.eod.tasks.push(...tasks);
+    assignDefined(user, userFields);
+    await user.save();
+
+    return user.toObject().eod;
+  }
+
+  async popEodTasks(
+    slackUserId: string,
+    numTasks = 0,
+    userFields?: {
+      slackUsername?: string;
+    },
+  ) {
+    this.logger.log(`Pop EOD tasks for user [${slackUserId}]`);
+
+    const user = await this.#findOrCreate(slackUserId);
+    user.eod.tasks.splice(user.eod.tasks.length - numTasks);
+    assignDefined(user, userFields);
+    await user.save();
+
+    return user.toObject().eod;
   }
 }
