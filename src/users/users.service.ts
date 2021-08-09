@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { assignDefined } from '../helpers/assign_defined';
+import { EodSlackPost } from './schemas/eod_slack_post.schema';
 import { User, UserDocument } from './schemas/user.schema';
 
 @Injectable()
@@ -62,6 +63,7 @@ export default class UsersService {
     this.logger.log(`Update EOD for user [${slackUserId}]`);
 
     const userDoc = await this.findOrCreateDoc(slackUserId, 'eod');
+    userDoc.eod.date = new Date();
     assignDefined(userDoc.eod, eodFields);
     assignDefined(userDoc, userFields);
     await userDoc.save();
@@ -78,12 +80,13 @@ export default class UsersService {
   ) {
     this.logger.log(`Push EOD tasks for user [${slackUserId}]`);
 
-    const user = await this.findOrCreateDoc(slackUserId, 'eod');
-    user.eod.tasks.push(...tasks);
-    assignDefined(user, userFields);
-    await user.save();
+    const userDoc = await this.findOrCreateDoc(slackUserId, 'eod');
+    userDoc.eod.date = new Date();
+    userDoc.eod.tasks.push(...tasks);
+    assignDefined(userDoc, userFields);
+    await userDoc.save();
 
-    return user.toObject().eod;
+    return userDoc.toObject().eod;
   }
 
   async popEodTasks(
@@ -101,5 +104,18 @@ export default class UsersService {
     await user.save();
 
     return user.toObject().eod;
+  }
+
+  async updateEodSlackPost(slackUserId: string, eodSlackPost: EodSlackPost) {
+    this.logger.log(`Update EOD Slack post for user [${slackUserId}]`);
+
+    const userDoc = await this.findOrCreateDoc(slackUserId, 'eodSlackPost');
+    userDoc.eod.date = new Date();
+    const oldEodSlackPost = userDoc.toObject().eodSlackPost;
+
+    assignDefined(userDoc.eodSlackPost, eodSlackPost);
+    await userDoc.save();
+
+    return oldEodSlackPost;
   }
 }

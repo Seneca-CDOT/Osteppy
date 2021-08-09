@@ -14,5 +14,5 @@ export const MONGO = {
 
 export const SLACK = {
   SIGNING_SECRET: env.SLACK_SIGNING_SECRET || '',
-  TEAM_ID: env.SLACK_TEAM_ID || '',
+  BOT_USER_TOKEN: env.SLACK_BOT_USER_TOKEN || '',
 } as const;

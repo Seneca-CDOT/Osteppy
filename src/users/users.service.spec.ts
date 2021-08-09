@@ -53,6 +53,10 @@ describe('UsersService', () => {
           tasks: [],
           slackEmoji: '',
         },
+        eodSlackPost: {
+          channelId: '',
+          timestamp: '',
+        },
       }),
     );
   });

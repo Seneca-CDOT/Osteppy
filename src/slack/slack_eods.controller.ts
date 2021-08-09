@@ -1,0 +1,15 @@
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import SlackGuard from './slack.guard';
+import SlackEodsService from './slack_eods.service';
+import SlackRequestDto from './slack_request.dts';
+
+@Controller('slack/eods')
+@UseGuards(SlackGuard)
+export default class SlackEodsController {
+  constructor(private slackEodsService: SlackEodsService) {}
+
+  @Post('update')
+  async update(@Body() slackRequestDto: SlackRequestDto) {
+    await this.slackEodsService.update(slackRequestDto);
+  }
+}
