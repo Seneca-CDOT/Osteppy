@@ -10,12 +10,22 @@ export default class UsersService {
 
   constructor(@InjectModel(User.name) public userModel: Model<UserDocument>) {}
 
-  async #findOrCreate(slackUserId: string, lean = false) {
+  private async findOrCreateDoc(
+    slackUserId: string,
+    projection?: string,
+    lean?: boolean,
+  ) {
     return this.userModel
       .findOneAndUpdate(
         { slackUserId },
         {},
-        { upsert: true, new: true, setDefaultsOnInsert: true, lean },
+        {
+          upsert: true,
+          new: true,
+          setDefaultsOnInsert: true,
+          projection,
+          lean,
+        },
       )
       .exec();
   }
@@ -36,7 +46,7 @@ export default class UsersService {
   }
 
   async findOrCreate(slackUserId: string): Promise<User> {
-    return this.#findOrCreate(slackUserId, true);
+    return this.findOrCreateDoc(slackUserId, undefined, true);
   }
 
   async updateEod(
@@ -51,7 +61,7 @@ export default class UsersService {
   ) {
     this.logger.log(`Update EOD for user [${slackUserId}]`);
 
-    const userDoc = await this.#findOrCreate(slackUserId);
+    const userDoc = await this.findOrCreateDoc(slackUserId, 'eod');
     assignDefined(userDoc.eod, eodFields);
     assignDefined(userDoc, userFields);
     await userDoc.save();
@@ -68,7 +78,7 @@ export default class UsersService {
   ) {
     this.logger.log(`Push EOD tasks for user [${slackUserId}]`);
 
-    const user = await this.#findOrCreate(slackUserId, false);
+    const user = await this.findOrCreateDoc(slackUserId, 'eod');
     user.eod.tasks.push(...tasks);
     assignDefined(user, userFields);
     await user.save();
@@ -85,7 +95,7 @@ export default class UsersService {
   ) {
     this.logger.log(`Pop EOD tasks for user [${slackUserId}]`);
 
-    const user = await this.#findOrCreate(slackUserId);
+    const user = await this.findOrCreateDoc(slackUserId, 'eod');
     user.eod.tasks.splice(user.eod.tasks.length - numTasks);
     assignDefined(user, userFields);
     await user.save();
