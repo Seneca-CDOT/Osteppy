@@ -29,7 +29,7 @@ export default class SlackEodsService {
 
     const header = `${slackEmoji} EOD was submitted by <@${slackUserId}> on ${dateCommand}`;
     const listedTasks = eod.tasks.map((task) => `>• ${task}`).join('\n');
-    const formattedText = `${header}\n${listedTasks}`;
+    const formattedText = `${header}\n${listedTasks || `>No tasks added yet`}`;
 
     return formattedText;
   }
