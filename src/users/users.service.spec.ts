@@ -14,6 +14,10 @@ describe('UsersService', () => {
     usersService = testingModule.get(UsersService);
   });
 
+  afterEach(async () => {
+    await testingModule.stop();
+  });
+
   test('find all', async () => {
     let users = await usersService.findAll();
     expect(users.length).toBe(0);
@@ -106,9 +110,5 @@ describe('UsersService', () => {
 
     eod = await usersService.popEodTasks('123', 10);
     expect(eod.tasks).toEqual([]);
-  });
-
-  afterEach(async () => {
-    await testingModule.stop();
   });
 });

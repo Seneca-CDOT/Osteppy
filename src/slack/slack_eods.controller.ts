@@ -10,6 +10,6 @@ export default class SlackEodsController {
 
   @Post('update')
   async update(@Body() slackRequestDto: SlackRequestDto) {
-    await this.slackEodsService.update(slackRequestDto);
+    return this.slackEodsService.update(slackRequestDto);
   }
 }

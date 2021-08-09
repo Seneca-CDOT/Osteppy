@@ -10,6 +10,4 @@ import UsersModule from './users/users.module';
   controllers: [AppController],
   providers: [AppService],
 })
-class AppModule {}
-
-export default AppModule;
+export default class AppModule {}

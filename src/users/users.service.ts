@@ -9,7 +9,7 @@ import { User, UserDocument } from './schemas/user.schema';
 export default class UsersService {
   private logger = new Logger(UsersService.name);
 
-  constructor(@InjectModel(User.name) public userModel: Model<UserDocument>) {}
+  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
   private async findOrCreateDoc(
     slackUserId: string,

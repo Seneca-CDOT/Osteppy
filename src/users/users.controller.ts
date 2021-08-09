@@ -6,22 +6,22 @@ export default class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Get()
-  findAll() {
+  async findAll() {
     return this.usersService.findAll();
   }
 
   @Delete()
-  deleteAll() {
+  async deleteAll() {
     return this.usersService.deleteAll();
   }
 
   @Get(':slackUserId')
-  find(@Param('slackUserId') slackUserId: string) {
+  async find(@Param('slackUserId') slackUserId: string) {
     return this.usersService.find(slackUserId);
   }
 
   @Patch(':slackUserId/eod/tasks/push-many')
-  pushEodTasks(
+  async pushEodTasks(
     @Param('slackUserId') slackUserId: string,
     @Body('tasks') tasks: string[],
   ) {
@@ -29,7 +29,7 @@ export default class UsersController {
   }
 
   @Patch(':slackUserId/eod/tasks/pop-many')
-  popEodTask(
+  async popEodTask(
     @Param('slackUserId') slackUserId: string,
     @Body('numTasks') numTasks: number,
   ) {
