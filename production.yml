@@ -12,7 +12,7 @@ services:
       - PORT
       - MONGO_HOST
       - SLACK_SIGNING_SECRET
-      - SLACK_TEAM_ID
+      - SLACK_BOT_USER_TOKEN
     ports:
       - ${PORT}:${PORT}
     depends_on:
