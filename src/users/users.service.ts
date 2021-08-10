@@ -98,12 +98,12 @@ export default class UsersService {
   ) {
     this.logger.log(`Pop EOD tasks for user [${slackUserId}]`);
 
-    const user = await this.findOrCreateDoc(slackUserId, 'eod');
-    user.eod.tasks.splice(user.eod.tasks.length - numTasks);
-    assignDefined(user, userFields);
-    await user.save();
+    const userDoc = await this.findOrCreateDoc(slackUserId, 'eod');
+    userDoc.eod.tasks.splice(userDoc.eod.tasks.length - numTasks);
+    assignDefined(userDoc, userFields);
+    await userDoc.save();
 
-    return user.toObject().eod;
+    return userDoc.toObject().eod;
   }
 
   async updateEodSlackPost(slackUserId: string, eodSlackPost: EodSlackPost) {

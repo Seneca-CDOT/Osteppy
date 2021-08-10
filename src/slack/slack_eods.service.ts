@@ -45,8 +45,8 @@ export default class SlackEodsService {
     this.logger.log(`Update EOD for user [${user_id}]`);
 
     // update EOD
-    const parsedEodText = SlackEodsService.parseEodFromText(text);
-    const eod = await this.usersService.updateEod(user_id, parsedEodText, {
+    const parsedEod = SlackEodsService.parseEodFromText(text);
+    const eod = await this.usersService.updateEod(user_id, parsedEod, {
       slackUsername: user_name,
     });
 

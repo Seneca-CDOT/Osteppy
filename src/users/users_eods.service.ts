@@ -42,7 +42,7 @@ export default class UsersEodsService {
     this.logger.log('Schedule archiving EOD for all users');
     if (this.isArchivingEodsScheduled) return;
 
-    // schedule at mid night
+    // schedule at midnight
     scheduleJob('0 0 0 * * *', () => this.archiveAllUsersEods());
     this.isArchivingEodsScheduled = true;
   }
