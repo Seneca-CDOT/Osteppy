@@ -4,6 +4,8 @@ dotenv.config();
 
 const { env } = process;
 
+export const NODE_ENV = env.NODE_ENV || '';
+
 export const PORT = env.PORT || 3000;
 
 export const MONGO = {

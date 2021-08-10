@@ -1,7 +1,17 @@
-import { Body, Controller, Delete, Get, Param, Patch } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  UseGuards,
+} from '@nestjs/common';
+import DevelopmentModeGuard from '../development_mode.guard';
 import UsersService from './users.service';
 
 @Controller('users')
+@UseGuards(DevelopmentModeGuard)
 export default class UsersController {
   constructor(private usersService: UsersService) {}
 
