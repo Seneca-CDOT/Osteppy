@@ -4,6 +4,8 @@ dotenv.config();
 
 const { env } = process;
 
+export const NODE_ENV = env.NODE_ENV || '';
+
 export const PORT = env.PORT || 3000;
 
 export const MONGO = {
@@ -14,5 +16,5 @@ export const MONGO = {
 
 export const SLACK = {
   SIGNING_SECRET: env.SLACK_SIGNING_SECRET || '',
-  TEAM_ID: env.SLACK_TEAM_ID || '',
+  BOT_USER_TOKEN: env.SLACK_BOT_USER_TOKEN || '',
 } as const;
