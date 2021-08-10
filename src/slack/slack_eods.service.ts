@@ -44,6 +44,7 @@ export default class SlackEodsService {
   async update({ text, user_id, user_name, channel_id }: SlackRequestDto) {
     this.logger.log(`Update EOD for user [${user_id}]`);
 
+    // update EOD
     const parsedEodText = SlackEodsService.parseEodFromText(text);
     const eod = await this.usersService.updateEod(user_id, parsedEodText, {
       slackUsername: user_name,
@@ -51,19 +52,23 @@ export default class SlackEodsService {
 
     // post EOD to Slack
     const eodText = SlackEodsService.formatEodToText(user_id, eod);
-    const eodPosting = await this.slackService.web.chat.postMessage({
-      channel: channel_id,
-      text: eodText,
-    });
-    if (!eodPosting.ts) {
-      this.logger.error(`Failed to post Eod to Slack for user [${user_id}]`);
-      return;
+    let eodSlackPostTimestamp = '';
+    try {
+      const eodPosting = await this.slackService.web.chat.postMessage({
+        channel: channel_id,
+        text: eodText,
+      });
+      eodSlackPostTimestamp = eodPosting.ts || '';
+    } catch {
+      this.logger.warn(`Channel is private [${channel_id}]`);
+      this.logger.warn(`Reply EOD directly instead`);
+      return eodText;
     }
 
     // delete old EOD Slack post
     const oldEodSlackPost = await this.usersService.updateEodSlackPost(
       user_id,
-      { channelId: channel_id, timestamp: eodPosting.ts },
+      { channelId: channel_id, timestamp: eodSlackPostTimestamp },
     );
     if (oldEodSlackPost.timestamp) {
       await this.slackService.web.chat.delete({
@@ -71,5 +76,7 @@ export default class SlackEodsService {
         ts: oldEodSlackPost.timestamp,
       });
     }
+
+    return null;
   }
 }
