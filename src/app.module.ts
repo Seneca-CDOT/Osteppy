@@ -4,9 +4,10 @@ import AppService from './app.service';
 import { DatabaseModule } from './database/database.module';
 import SlackModule from './slack/slack.module';
 import UsersModule from './users/users.module';
+import SystemModule from './system/system.module';
 
 @Module({
-  imports: [DatabaseModule, UsersModule, SlackModule],
+  imports: [DatabaseModule, UsersModule, SlackModule, SystemModule],
   controllers: [AppController],
   providers: [AppService],
 })
