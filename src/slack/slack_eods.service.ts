@@ -10,7 +10,7 @@ export default class SlackEodsService {
     const lines: string[] = [];
 
     text.split('\n').forEach((line) => {
-      const removedList = line.replace(/^\s*• /, '');
+      const removedList = line.replace(/^\s*[•-]\s*/, '');
       const trimmed = removedList.trim();
       if (trimmed) lines.push(trimmed);
     });
