@@ -12,4 +12,14 @@ export default class SlackEodsController {
   async update(@Body() slackRequestDto: SlackRequestDto) {
     return this.slackEodsService.update(slackRequestDto);
   }
+
+  @Post('push-tasks')
+  async pushTasks(@Body() slackRequestDto: SlackRequestDto) {
+    return this.slackEodsService.pushTasks(slackRequestDto);
+  }
+
+  @Post('pop-tasks')
+  async popTasks(@Body() slackRequestDto: SlackRequestDto) {
+    return this.slackEodsService.popTasks(slackRequestDto);
+  }
 }

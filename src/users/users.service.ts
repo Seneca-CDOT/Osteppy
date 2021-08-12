@@ -99,7 +99,7 @@ export default class UsersService {
     this.logger.log(`Pop EOD tasks for user [${slackUserId}]`);
 
     const userDoc = await this.findOrCreateDoc(slackUserId, 'eod');
-    userDoc.eod.tasks.splice(userDoc.eod.tasks.length - numTasks);
+    userDoc.eod.tasks.splice(Math.max(userDoc.eod.tasks.length - numTasks, 0));
     assignDefined(userDoc, userFields);
     await userDoc.save();
 
