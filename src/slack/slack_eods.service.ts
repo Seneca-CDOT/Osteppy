@@ -41,34 +41,32 @@ export default class SlackEodsService {
     private usersService: UsersService,
   ) {}
 
-  async update({ text, user_id, user_name, channel_id }: SlackRequestDto) {
-    this.logger.log(`Update EOD for user [${user_id}]`);
-
-    // update EOD
-    const parsedEod = SlackEodsService.parseEodFromText(text);
-    const eod = await this.usersService.updateEod(user_id, parsedEod, {
-      slackUsername: user_name,
-    });
+  private async updateSlackPost(
+    slackUserId: string,
+    slackChannelId: string,
+    eod: Eod,
+  ) {
+    this.logger.log(`Update EOD Slack post for user [${slackUserId}]`);
 
     // post EOD to Slack
-    const eodText = SlackEodsService.formatEodToText(user_id, eod);
+    const eodText = SlackEodsService.formatEodToText(slackUserId, eod);
     let eodSlackPostTimestamp = '';
     try {
       const eodPosting = await this.slackService.web.chat.postMessage({
-        channel: channel_id,
+        channel: slackChannelId,
         text: eodText,
       });
       eodSlackPostTimestamp = eodPosting.ts || '';
     } catch {
-      this.logger.warn(`Channel is private [${channel_id}]`);
+      this.logger.warn(`Failed to post EOD to channel [${slackChannelId}]`);
       this.logger.warn(`Reply EOD directly instead`);
       return eodText;
     }
 
     // delete old EOD Slack post
     const oldEodSlackPost = await this.usersService.updateEodSlackPost(
-      user_id,
-      { channelId: channel_id, timestamp: eodSlackPostTimestamp },
+      slackUserId,
+      { channelId: slackChannelId, timestamp: eodSlackPostTimestamp },
     );
     if (oldEodSlackPost.timestamp) {
       await this.slackService.web.chat.delete({
@@ -78,5 +76,42 @@ export default class SlackEodsService {
     }
 
     return null;
+  }
+
+  async update({ text, user_id, user_name, channel_id }: SlackRequestDto) {
+    this.logger.log(`Update EOD for user [${user_id}]`);
+
+    const parsedEod = SlackEodsService.parseEodFromText(text);
+    const eod = await this.usersService.updateEod(user_id, parsedEod, {
+      slackUsername: user_name,
+    });
+
+    return this.updateSlackPost(user_id, channel_id, eod);
+  }
+
+  async pushTasks({ text, user_id, user_name, channel_id }: SlackRequestDto) {
+    this.logger.log(`Push EOD tasks for user [${user_id}]`);
+
+    const { tasks } = SlackEodsService.parseEodFromText(text);
+    const eod = await this.usersService.pushEodTasks(user_id, tasks, {
+      slackUsername: user_name,
+    });
+
+    return this.updateSlackPost(user_id, channel_id, eod);
+  }
+
+  async popTasks({ text, user_id, user_name, channel_id }: SlackRequestDto) {
+    this.logger.log(`Pop EOD tasks for user [${user_id}]`);
+
+    const numTasks = Number.parseInt(text, 10);
+    if (!(numTasks > 0)) {
+      return `Input should be a positive number`;
+    }
+
+    const eod = await this.usersService.popEodTasks(user_id, numTasks, {
+      slackUsername: user_name,
+    });
+
+    return this.updateSlackPost(user_id, channel_id, eod);
   }
 }
