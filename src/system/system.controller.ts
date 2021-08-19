@@ -9,6 +9,6 @@ export default class SystemController {
 
   @Post('message')
   async sendMessage() {
-    return this.systemService.sendMessage();
+    return this.systemService.portCheck();
   }
 }
