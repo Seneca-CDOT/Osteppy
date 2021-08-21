@@ -8,7 +8,7 @@ import Service from './system_services.dts';
 import SlackService from '../slack/slack.service';
 import { SLACK } from '../configuration';
 
-const pathToPortFile = '../../config_files/domains.json';
+const pathToPortFile = `../../config_files/${SLACK.DOMAINS_FILE_NAME}`;
 
 @Injectable()
 export default class SystemService {
@@ -17,17 +17,6 @@ export default class SystemService {
   private isPortWatchingScheduled = false;
 
   constructor(private slackService: SlackService) {}
-
-  readDomainsFile() {
-    let data;
-    try {
-      data = fs.readFileSync(join(__dirname, pathToPortFile), 'utf-8');
-    } catch (err) {
-      this.logger.log(err);
-    }
-
-    return JSON.parse(data || '');
-  }
 
   /**
    * Promisify shelljs
@@ -61,17 +50,27 @@ export default class SystemService {
   }
 
   formatMessage(domains: Domain[]) {
-    let formattedMessage = '```Unregistered Open Ports\n';
+    const header = '# Unregistered Opened Ports\n';
+    const tag = '```';
+
+    // Header
+    let formattedMessage = `${tag}${header}`;
 
     domains.forEach((domain) => {
-      formattedMessage += `Domain: ${domain.domain}\nPorts: `;
+      // Domain name
+      formattedMessage += `- Domain: ${domain.domain}\n  ${
+        domain.services.length > 1 ? 'Ports ' : 'Port  '
+      }: `;
 
+      // Ports
       domain.services.forEach((service) => {
         formattedMessage += `${service.port} `;
       });
-      formattedMessage += '\n\n';
+
+      formattedMessage += '\n';
     });
-    formattedMessage += '```';
+
+    formattedMessage += tag;
 
     return formattedMessage;
   }
@@ -80,8 +79,24 @@ export default class SystemService {
     this.logger.log('Initializing port watching');
 
     // Get domains' data from the json file
-    const storedDomains = this.readDomainsFile();
-    this.logger.log('Ports file successfully loaded');
+    let storedDomains;
+    try {
+      storedDomains = JSON.parse(
+        fs.readFileSync(join(__dirname, pathToPortFile), 'utf-8'),
+      );
+
+      this.logger.log(`${SLACK.DOMAINS_FILE_NAME} successfully loaded`);
+    } catch (err) {
+      this.logger.log(err);
+
+      const tag = '```';
+      await this.slackService.web.chat.postMessage({
+        channel: SLACK.PORT_CHECKER_CHANNEL,
+        text: `${tag} # Error: There was an error opening ${SLACK.DOMAINS_FILE_NAME}${tag}`,
+      });
+
+      return;
+    }
 
     // Scan ports using the stored data
     const scannedDomains: string[] = await Promise.all(
@@ -115,7 +130,7 @@ export default class SystemService {
     this.logger.log('Schedule Port Watching');
     if (this.isPortWatchingScheduled) return;
 
-    // schedule every hour
+    // schedule every hour at minute 0
     scheduleJob('0 * * * *', () => this.portCheck());
     this.isPortWatchingScheduled = true;
   }
