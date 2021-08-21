@@ -17,5 +17,7 @@ export const MONGO = {
 export const SLACK = {
   SIGNING_SECRET: env.SLACK_SIGNING_SECRET || '',
   BOT_USER_TOKEN: env.SLACK_BOT_USER_TOKEN || '',
+
   PORT_CHECKER_CHANNEL: env.PORT_CHECKER_CHANNEL || 'C023BLCKARG',
+  DOMAINS_FILE_NAME: env.DOMAINS_FILE_NAME || 'domains.json',
 } as const;
