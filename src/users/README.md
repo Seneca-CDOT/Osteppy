@@ -4,8 +4,8 @@ This module is responsible for managing the `users` MongoDB collection.
 
 ## Services
 
-- [`UsersService`](src/users/users.service.ts): provides basic CRUD methods for querying users or modifying a user.
-- [`UsersEodsService`](src/users/users_eods.service.ts): provides methods which process EODs across all users.
+- [`UsersService`](users.service.ts): provides basic CRUD methods for querying users or modifying a user.
+- [`UsersEodsService`](users_eods.service.ts): provides methods which process EODs across all users.
 
 ## Controllers
 
