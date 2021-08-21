@@ -19,13 +19,15 @@ The defined endpoints are exposed in `development mode` only, and should be used
 
   ```ts
   // request body
-  { tasks: string[] }
+  {
+    tasks: string[]; // tasks to push
+  }
   ```
 
 - `[PATCH] /users/:slackUserId/eod/tasks/pop-many`: pop EOD tasks of a user.
   ```ts
   // request body
   {
-    numTasks: number;
+    numTasks: number; // number of tasks to pop
   }
   ```
