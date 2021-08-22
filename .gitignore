@@ -24,3 +24,6 @@ config-files/
 
 # MongoDB
 osteppy_data/
+
+# Portainer
+portainer/
