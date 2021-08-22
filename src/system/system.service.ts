@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { scheduleJob } from 'node-schedule';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import * as fs from 'fs';
 import { join } from 'path';
 import * as shelljs from 'shelljs';
@@ -13,8 +13,6 @@ const pathToPortFile = `../../config_files/${SLACK.DOMAINS_FILE_NAME}`;
 @Injectable()
 export default class SystemService {
   private readonly logger = new Logger(SystemService.name);
-
-  private isPortWatchingScheduled = false;
 
   /**
    * Promisify shelljs
@@ -101,7 +99,9 @@ export default class SystemService {
     // Scan ports using the stored data
     const scannedDomains: string[] = await Promise.all(
       storedDomains.map(({ domain }: Domain) =>
-        SystemService.shellAsync(`nmap -p- ${domain}`),
+        // Info about -Pn option
+        // https://nmap.org/book/man-host-discovery.html
+        SystemService.shellAsync(`nmap -Pn ${domain}`),
       ),
     );
 
@@ -127,12 +127,8 @@ export default class SystemService {
       });
   }
 
+  @Cron(CronExpression.EVERY_HOUR)
   schedulePortWatching() {
-    this.logger.log('Schedule Port Watching');
-    if (this.isPortWatchingScheduled) return;
-
-    // schedule every hour at minute 0
-    scheduleJob('0 * * * *', () => this.portCheck());
-    this.isPortWatchingScheduled = true;
+    this.portCheck();
   }
 }

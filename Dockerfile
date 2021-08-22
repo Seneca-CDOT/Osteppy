@@ -5,6 +5,7 @@
 FROM node:lts-alpine as build
 
 # Tini Entrypoint for Alpine
+RUN apk add nmap
 RUN apk add --no-cache tini
 ENTRYPOINT [ "/sbin/tini", "--"]
 
@@ -40,6 +41,7 @@ FROM build AS release
 # GET deployment code from previous containers
 COPY --from=dependencies /osteppy/node_modules /osteppy/node_modules
 COPY --from=builder /osteppy/dist /osteppy/dist
+COPY config_files /osteppy/config_files
 
 # Running osteppy when the image gets built using a script
 CMD ["sh", "-c", "npm run start:prod"]
