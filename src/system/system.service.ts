@@ -3,8 +3,8 @@ import { scheduleJob } from 'node-schedule';
 import * as fs from 'fs';
 import { join } from 'path';
 import * as shelljs from 'shelljs';
-import Domain from './system_domains.dts';
-import Service from './system_services.dts';
+import Domain from './system_domains';
+import Service from './system_services';
 import SlackService from '../slack/slack.service';
 import { SLACK } from '../configuration';
 
@@ -16,13 +16,11 @@ export default class SystemService {
 
   private isPortWatchingScheduled = false;
 
-  constructor(private slackService: SlackService) {}
-
   /**
    * Promisify shelljs
    * https://gist.github.com/davidrleonard/2962a3c40497d93c422d1269bcd38c8f
    */
-  shellAsync(cmd: string) {
+  static shellAsync(cmd: string) {
     return new Promise((resolve, reject) => {
       shelljs.exec(cmd, { silent: true }, (code, stdout, stderr) => {
         if (code !== 0) return reject(new Error(stderr));
@@ -31,7 +29,7 @@ export default class SystemService {
     });
   }
 
-  parseDomain(domainData: string) {
+  static parseDomain(domainData: string) {
     // Extract the domain
     const domainRegex = /([a-z0-0]*\.[a-z0-9]*|[a-z0-9]*)\.cdot\.systems/;
     const domain = domainData.match(domainRegex);
@@ -46,10 +44,10 @@ export default class SystemService {
       };
     });
 
-    return { domain, services: ports };
+    return { domain: domain?.length ? domain[0] : '', services: ports };
   }
 
-  formatMessage(domains: Domain[]) {
+  static formatMessage(domains: Domain[]) {
     const header = '# Unregistered Opened Ports\n';
     const tag = '```';
 
@@ -60,11 +58,11 @@ export default class SystemService {
       // Domain name
       formattedMessage += `- Domain: ${domain.domain}\n  ${
         domain.services.length > 1 ? 'Ports ' : 'Port  '
-      }: `;
+      }:`;
 
       // Ports
       domain.services.forEach((service) => {
-        formattedMessage += `${service.port} `;
+        formattedMessage += ` ${service.port}`;
       });
 
       formattedMessage += '\n';
@@ -74,6 +72,8 @@ export default class SystemService {
 
     return formattedMessage;
   }
+
+  constructor(private slackService: SlackService) {}
 
   async portCheck() {
     this.logger.log('Initializing port watching');
@@ -101,7 +101,7 @@ export default class SystemService {
     // Scan ports using the stored data
     const scannedDomains: string[] = await Promise.all(
       storedDomains.map(({ domain }: Domain) =>
-        this.shellAsync(`nmap -p- ${domain}`),
+        SystemService.shellAsync(`nmap -p- ${domain}`),
       ),
     );
 
@@ -110,7 +110,7 @@ export default class SystemService {
       const unregisteredPorts: Service[] = [];
       const storedPorts = services.map(({ port }: { port: number }) => port);
 
-      const parsedDomain = this.parseDomain(scannedDomains[index]);
+      const parsedDomain = SystemService.parseDomain(scannedDomains[index]);
       parsedDomain.services.forEach((service) => {
         if (!storedPorts.includes(service.port))
           unregisteredPorts.push({ port: service.port });
@@ -120,10 +120,11 @@ export default class SystemService {
         domainsToReport.push({ domain, services: unregisteredPorts });
     });
 
-    await this.slackService.web.chat.postMessage({
-      channel: SLACK.PORT_CHECKER_CHANNEL,
-      text: this.formatMessage(domainsToReport),
-    });
+    if (domainsToReport.length)
+      await this.slackService.web.chat.postMessage({
+        channel: SLACK.PORT_CHECKER_CHANNEL,
+        text: SystemService.formatMessage(domainsToReport),
+      });
   }
 
   schedulePortWatching() {
