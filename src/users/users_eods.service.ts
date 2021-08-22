@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { Model } from 'mongoose';
-import { scheduleJob } from 'node-schedule';
 import { User, UserDocument } from './schemas/user.schema';
 
 @Injectable()
@@ -38,12 +38,8 @@ export default class UsersEodsService {
     return result;
   }
 
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   scheduleArchivingEods() {
-    this.logger.log('Schedule archiving EOD for all users');
-    if (this.isArchivingEodsScheduled) return;
-
-    // schedule at midnight
-    scheduleJob('0 0 0 * * *', () => this.archiveAllUsersEods());
-    this.isArchivingEodsScheduled = true;
+    this.archiveAllUsersEods();
   }
 }

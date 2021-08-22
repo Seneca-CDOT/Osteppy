@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { scheduleJob } from 'node-schedule';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import * as fs from 'fs';
 import { join } from 'path';
 import * as shelljs from 'shelljs';
@@ -127,12 +127,8 @@ export default class SystemService {
       });
   }
 
+  @Cron(CronExpression.EVERY_HOUR)
   schedulePortWatching() {
-    this.logger.log('Schedule Port Watching');
-    if (this.isPortWatchingScheduled) return;
-
-    // schedule every hour at minute 0
-    scheduleJob('0 * * * *', () => this.portCheck());
-    this.isPortWatchingScheduled = true;
+    this.portCheck();
   }
 }
