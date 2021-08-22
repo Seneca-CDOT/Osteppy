@@ -99,7 +99,9 @@ export default class SystemService {
     // Scan ports using the stored data
     const scannedDomains: string[] = await Promise.all(
       storedDomains.map(({ domain }: Domain) =>
-        SystemService.shellAsync(`nmap -p- ${domain}`),
+        // Info about -Pn option
+        // https://nmap.org/book/man-host-discovery.html
+        SystemService.shellAsync(`nmap -Pn ${domain}`),
       ),
     );
 
