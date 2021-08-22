@@ -14,8 +14,6 @@ const pathToPortFile = `../../config_files/${SLACK.DOMAINS_FILE_NAME}`;
 export default class SystemService {
   private readonly logger = new Logger(SystemService.name);
 
-  private isPortWatchingScheduled = false;
-
   /**
    * Promisify shelljs
    * https://gist.github.com/davidrleonard/2962a3c40497d93c422d1269bcd38c8f

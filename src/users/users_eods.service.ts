@@ -8,8 +8,6 @@ import { User, UserDocument } from './schemas/user.schema';
 export default class UsersEodsService {
   private readonly logger = new Logger(UsersEodsService.name);
 
-  private isArchivingEodsScheduled = false;
-
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
   async archiveAllUsersEods() {
