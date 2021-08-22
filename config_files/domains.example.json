@@ -1,0 +1,10 @@
+[
+  {
+    "domain": "domain.cdot.systems",
+    "services": [
+      { "port": 22, "service": "ssh" },
+      { "port": 80, "service": "My http server" },
+      { "port": 443, "service": "My https server" }
+    ]
+  }
+]
