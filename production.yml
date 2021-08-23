@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  osteppy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - TZ
+      - MONGO_USER
+      - MONGO_PASS
+      - PORT
+      - MONGO_HOST
+      - SLACK_SIGNING_SECRET
+      - SLACK_BOT_USER_TOKEN
+    ports:
+      - ${PORT}:${PORT}
+    depends_on:
+      - mongodb
+    restart: always
+
+  portainer:
+    image: portainer/portainer-ce:alpine
+    command: -H unix:///var/run/docker.sock
+    restart: always
+    ports:
+      - 9000:9000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./portainer:/data
+    depends_on:
+      - osteppy
+      - mongodb

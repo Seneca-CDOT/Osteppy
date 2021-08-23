@@ -1,11 +1,29 @@
-/dist
-/logs
-/npm-debug.log
-/node_modules
-.DS_Store
-/eods.json
-*secret*
-/src/clock.txt
-*.env
-/config-files/*
-!/config-files/.gitkeep
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+
+node_modules/
+.env
+dist/
+
+# Typescript v1 declaration files
+typings/
+
+# Config files
+config-files/
+!config-files/.gitkeep
+
+# MongoDB
+osteppy_data/
+
+# Portainer
+portainer/
