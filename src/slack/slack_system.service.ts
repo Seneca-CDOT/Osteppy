@@ -2,7 +2,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import * as fs from 'fs';
 import { join } from 'path';
 import SlackRequestDto from './slack_request.dts';
-import SlackService from './slack.service';
 import Domain from '../system/system_domains';
 import { SLACK } from '../configuration';
 
@@ -39,9 +38,7 @@ export default class SlackSystemService {
     return formattedList;
   }
 
-  constructor(private slackService: SlackService) {}
-
-  async listPorts({ text }: SlackRequestDto) {
+  listPorts({ text }: SlackRequestDto) {
     let storedDomains;
 
     try {
