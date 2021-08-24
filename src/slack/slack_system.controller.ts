@@ -5,7 +5,7 @@ import SlackRequestDto from './slack_request.dts';
 
 @Controller('slack/system')
 @UseGuards(SlackGuard)
-export default class SlackEodsController {
+export default class SlackSystemController {
   constructor(private slackSystemService: SlackSystemService) {}
 
   @Post('list-ports')
