@@ -19,8 +19,8 @@ dist/
 typings/
 
 # Config files
-config-files/
-!config-files/.gitkeep
+config_files/
+!config_files/domains.example.json
 
 # MongoDB
 osteppy_data/
