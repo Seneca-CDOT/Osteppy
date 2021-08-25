@@ -5,7 +5,7 @@ services:
     ports:
       - 127.0.0.1:27017:27017
 
-    mongo_express:
+  mongo_express:
     image: mongo-express:latest
     environment:
       - ME_CONFIG_OPTIONS_EDITORTHEME=default
