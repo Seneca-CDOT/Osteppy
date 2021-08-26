@@ -11,4 +11,9 @@ export default class SystemController {
   async sendMessage() {
     return this.systemService.portCheck();
   }
+
+  @Get('load-domains')
+  loadDomains() {
+    this.systemService.loadDomains();
+  }
 }

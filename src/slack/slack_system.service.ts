@@ -1,57 +1,20 @@
 import { Injectable, Logger } from '@nestjs/common';
-import * as fs from 'fs';
-import { join } from 'path';
 import SlackRequestDto from './slack_request.dts';
-import Domain from '../system/system_domains';
-import { SLACK } from '../configuration';
+import SystemService from '../system/system.service';
 
-const pathToPortFile = `../../config_files/${SLACK.DOMAINS_FILE_NAME}`;
+import Domain from '../system/system_domains';
 
 @Injectable()
 export default class SlackSystemService {
   private readonly logger = new Logger(SlackSystemService.name);
 
-  static formatList(list: Domain[]) {
-    const tag = '```';
-    const header = '# Registered Services\n';
+  constructor(private systemService: SystemService) {}
 
-    const portColumnWidth = 5;
-
-    // Header
-    let formattedList = `${tag}${header}`;
-
-    list.forEach((domain: Domain) => {
-      const domainName = domain.domain.replace('.cdot.systems', '');
-      formattedList += `${domainName}:\n`;
-      // Ports
-      domain.services.forEach((service) => {
-        formattedList += service.port.toString().padEnd(portColumnWidth);
-
-        formattedList += `${service.service}\n`;
-      });
-
-      formattedList += '\n';
-    });
-
-    formattedList += tag;
-
-    return formattedList;
-  }
-
-  listPorts({ text }: SlackRequestDto) {
-    let storedDomains;
-
-    try {
-      storedDomains = JSON.parse(
-        fs.readFileSync(join(__dirname, pathToPortFile), 'utf-8'),
-      );
-
-      this.logger.log(`${SLACK.DOMAINS_FILE_NAME} successfully loaded`);
-    } catch (err) {
-      this.logger.log(err);
-
+  async listPorts({ text }: SlackRequestDto) {
+    const storedDomains: Domain[] = await this.systemService.findAll();
+    if (!storedDomains.length) {
       const tag = '```';
-      return `${tag} # Error: There was an error opening ${SLACK.DOMAINS_FILE_NAME}${tag}`;
+      return `${tag} # There are no registered ports${tag}`;
     }
 
     let formattedList;
@@ -61,11 +24,12 @@ export default class SlackSystemService {
         ? `${text.trim()}.cdot.systems`
         : text;
 
-      formattedList = SlackSystemService.formatList(
+      formattedList = SystemService.formatMessage(
         storedDomains.filter((domain: Domain) => domain.domain === text.trim()),
+        true,
       );
     } else {
-      formattedList = SlackSystemService.formatList(storedDomains);
+      formattedList = SystemService.formatMessage(storedDomains, true);
     }
 
     return formattedList;

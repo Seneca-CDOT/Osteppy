@@ -1,7 +1,7 @@
 import Service from './system_services';
 
 export default class Domain {
-  domain: string;
+  domain!: string;
 
-  services: Service[];
+  services!: Service[];
 }
