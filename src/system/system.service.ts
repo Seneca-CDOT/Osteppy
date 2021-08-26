@@ -1,11 +1,14 @@
+import { WebClient } from '@slack/web-api';
 import { Injectable, Logger } from '@nestjs/common';
+import { Model } from 'mongoose';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { InjectModel } from '@nestjs/mongoose';
 import * as fs from 'fs';
 import { join } from 'path';
 import * as shelljs from 'shelljs';
 import Domain from './system_domains';
 import Service from './system_services';
-import SlackService from '../slack/slack.service';
+import { DomainDocument } from './schemas/domain.schema';
 import { SLACK } from '../configuration';
 
 const pathToPortFile = `../../config_files/${SLACK.DOMAINS_FILE_NAME}`;
@@ -14,11 +17,13 @@ const pathToPortFile = `../../config_files/${SLACK.DOMAINS_FILE_NAME}`;
 export default class SystemService {
   private readonly logger = new Logger(SystemService.name);
 
+  private readonly web = new WebClient(SLACK.BOT_USER_TOKEN);
+
   /**
    * Promisify shelljs
    * https://gist.github.com/davidrleonard/2962a3c40497d93c422d1269bcd38c8f
    */
-  static shellAsync(cmd: string) {
+  static shellAsync(cmd: string): Promise<string> {
     return new Promise((resolve, reject) => {
       shelljs.exec(cmd, { silent: true }, (code, stdout, stderr) => {
         if (code !== 0) return reject(new Error(stderr));
@@ -45,64 +50,125 @@ export default class SystemService {
     return { domain: domain?.length ? domain[0] : '', services: ports };
   }
 
-  static formatMessage(domains: Domain[]) {
-    const header = '# Unregistered Opened Ports\n';
+  static formatMessage(domains: Domain[], isRegistered: boolean) {
+    const header = isRegistered
+      ? '# Registered Services\n'
+      : '# Unregistered Opened Ports\n';
     const tag = '```';
+    const portColumnWidth = 5;
 
     // Header
     let formattedMessage = `${tag}${header}`;
 
-    domains.forEach((domain) => {
-      // Domain name
-      formattedMessage += `- Domain: ${domain.domain}\n  ${
-        domain.services.length > 1 ? 'Ports ' : 'Port  '
-      }:`;
+    if (isRegistered) {
+      domains.forEach((domain) => {
+        const domainName = domain.domain.replace('.cdot.systems', '');
+        formattedMessage += `${domainName}:\n`;
+        // Ports
+        domain.services.forEach((service) => {
+          formattedMessage += service.port.toString().padEnd(portColumnWidth);
 
-      // Ports
-      domain.services.forEach((service) => {
-        formattedMessage += ` ${service.port}`;
+          formattedMessage += `${service.service}\n`;
+        });
+        formattedMessage += '\n';
       });
+    } else {
+      domains.forEach((domain) => {
+        // Domain name
+        formattedMessage += `- Domain: ${domain.domain}\n  ${
+          domain.services.length > 1 ? 'Ports ' : 'Port  '
+        }:`;
 
-      formattedMessage += '\n';
-    });
+        // Ports
+        domain.services.forEach((service) => {
+          formattedMessage += ` ${service.port}`;
+        });
+        formattedMessage += '\n';
+      });
+    }
 
     formattedMessage += tag;
 
     return formattedMessage;
   }
 
-  constructor(private slackService: SlackService) {}
+  static formatList(list: Domain[]) {
+    const tag = '```';
+    const header = '# Registered Services\n';
 
-  async portCheck() {
-    this.logger.log('Initializing port watching');
+    const portColumnWidth = 5;
 
-    // Get domains' data from the json file
-    let storedDomains;
+    // Header
+    let formattedList = `${tag}${header}`;
+
+    list.forEach((domain: Domain) => {
+      const domainName = domain.domain.replace('.cdot.systems', '');
+      formattedList += `${domainName}:\n`;
+      // Ports
+      domain.services.forEach((service) => {
+        formattedList += service.port.toString().padEnd(portColumnWidth);
+
+        formattedList += `${service.service}\n`;
+      });
+
+      formattedList += '\n';
+    });
+
+    formattedList += tag;
+
+    return formattedList;
+  }
+
+  constructor(
+    @InjectModel(Domain.name) private DomainModel: Model<DomainDocument>,
+  ) {}
+
+  private async loadDomainsFromFile() {
     try {
-      storedDomains = JSON.parse(
+      return JSON.parse(
         fs.readFileSync(join(__dirname, pathToPortFile), 'utf-8'),
       );
-
-      this.logger.log(`${SLACK.DOMAINS_FILE_NAME} successfully loaded`);
     } catch (err) {
       this.logger.log(err);
 
       const tag = '```';
-      await this.slackService.web.chat.postMessage({
+      await this.web.chat.postMessage({
         channel: SLACK.PORT_CHECKER_CHANNEL,
         text: `${tag} # Error: There was an error opening ${SLACK.DOMAINS_FILE_NAME}${tag}`,
       });
 
-      return;
+      return [];
     }
+  }
+
+  async findAll() {
+    this.logger.log('Find all Domains');
+    const domains = await this.DomainModel.find();
+
+    return domains.map((domain) => {
+      return {
+        domain: domain.domain,
+        services: domain.services.map(({ port, service }) => ({
+          port,
+          service,
+        })),
+      };
+    });
+  }
+
+  async portCheck() {
+    this.logger.log('Initializing port watching');
+
+    // Get domains' data from the database
+    const storedDomains: Domain[] = await this.findAll();
 
     // Scan ports using the stored data
     const scannedDomains: string[] = await Promise.all(
-      storedDomains.map(({ domain }: Domain) =>
+      storedDomains.map(({ domain }) => {
         // Info about -Pn option
         // https://nmap.org/book/man-host-discovery.html
-        SystemService.shellAsync(`nmap -Pn ${domain}`),
-      ),
+        return SystemService.shellAsync(`nmap -Pn ${domain}`);
+      }),
     );
 
     const domainsToReport: Domain[] = [];
@@ -121,10 +187,17 @@ export default class SystemService {
     });
 
     if (domainsToReport.length)
-      await this.slackService.web.chat.postMessage({
+      await this.web.chat.postMessage({
         channel: SLACK.PORT_CHECKER_CHANNEL,
-        text: SystemService.formatMessage(domainsToReport),
+        text: SystemService.formatMessage(domainsToReport, false),
       });
+  }
+
+  async loadDomains() {
+    this.logger.log('loading domains');
+    const domains = await this.loadDomainsFromFile();
+
+    this.DomainModel.insertMany(domains);
   }
 
   @Cron(CronExpression.EVERY_HOUR)

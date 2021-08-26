@@ -1,5 +1,5 @@
 export default class Service {
-  port: number;
+  port!: number;
 
   service?: string;
 }
