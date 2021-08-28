@@ -92,33 +92,6 @@ export default class SystemService {
     return formattedMessage;
   }
 
-  static formatList(list: Domain[]) {
-    const tag = '```';
-    const header = '# Registered Services\n';
-
-    const portColumnWidth = 5;
-
-    // Header
-    let formattedList = `${tag}${header}`;
-
-    list.forEach((domain: Domain) => {
-      const domainName = domain.domain.replace('.cdot.systems', '');
-      formattedList += `${domainName}:\n`;
-      // Ports
-      domain.services.forEach((service) => {
-        formattedList += service.port.toString().padEnd(portColumnWidth);
-
-        formattedList += `${service.service}\n`;
-      });
-
-      formattedList += '\n';
-    });
-
-    formattedList += tag;
-
-    return formattedList;
-  }
-
   constructor(
     @InjectModel(Domain.name) private DomainModel: Model<DomainDocument>,
   ) {}
