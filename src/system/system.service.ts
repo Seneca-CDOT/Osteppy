@@ -195,9 +195,7 @@ export default class SystemService {
 
   async loadDomains() {
     this.logger.log('loading domains');
-    const domains = await this.loadDomainsFromFile();
-
-    this.DomainModel.insertMany(domains);
+    this.DomainModel.insertMany(await this.loadDomainsFromFile());
   }
 
   @Cron(CronExpression.EVERY_HOUR)

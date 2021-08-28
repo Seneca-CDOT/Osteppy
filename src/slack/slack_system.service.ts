@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import SlackRequestDto from './slack_request.dts';
 import SystemService from '../system/system.service';
-
 import Domain from '../system/system_domains';
 
 @Injectable()

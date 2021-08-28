@@ -19,7 +19,7 @@ describe('System service', () => {
   });
 
   test('Test formatter', () => {
-    const formattedMessage = SystemService.formatMessage([parsedDomain]);
+    const formattedMessage = SystemService.formatMessage([parsedDomain], false);
 
     expect(formattedMessage).toBe(message);
   });
