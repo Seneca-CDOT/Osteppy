@@ -26,7 +26,7 @@ describe('System service', () => {
 
   test('Test formatter for unregistered ports', () => {
     const unregisteredPortsMessage =
-      '```# Unregistered Opened Ports\n- Domain: domain.cdot.systems\n  Ports : 22 80 443\n```';
+      '<!here>\n```# Unregistered Opened Ports\n- Domain: domain.cdot.systems\n  Ports : 22 80 443\n```';
 
     const formattedMessage = SystemService.formatMessage(
       [nmapParsedDomain],
