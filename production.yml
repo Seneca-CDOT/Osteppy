@@ -13,6 +13,8 @@ services:
       - MONGO_HOST
       - SLACK_SIGNING_SECRET
       - SLACK_BOT_USER_TOKEN
+      - PORT_CHECKER_CHANNEL
+      - DOMAINS_FILE_NAME
     ports:
       - ${PORT}:${PORT}
     depends_on:
