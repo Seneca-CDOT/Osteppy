@@ -51,6 +51,7 @@ export default class SystemService {
   }
 
   static formatMessage(domains: Domain[], isRegistered: boolean) {
+    const prefix = '<!here>\n';
     const header = isRegistered
       ? '# Registered Services\n'
       : '# Unregistered Opened Ports\n';
@@ -88,6 +89,7 @@ export default class SystemService {
     }
 
     formattedMessage += tag;
+    formattedMessage = prefix + formattedMessage;
 
     return formattedMessage;
   }
