@@ -36,7 +36,7 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^6.5.5",
-    "shelljs": "^0.8.4",
+    "shelljs": "^0.8.5",
     "supertest": "^4.0.2"
   },
   "devDependencies": {
