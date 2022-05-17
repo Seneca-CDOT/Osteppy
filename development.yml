@@ -6,7 +6,7 @@ services:
       - 127.0.0.1:27017:27017
 
   mongo_express:
-    image: mongo-express:latest
+    image: mongo-express:0.54
     environment:
       - ME_CONFIG_OPTIONS_EDITORTHEME=default
       - ME_CONFIG_MONGODB_SERVER=mongo_db
