@@ -170,7 +170,9 @@ export default class SystemService {
 
   async loadDomains() {
     this.logger.log('loading domains');
-    this.DomainModel.insertMany(await this.loadDomainsFromFile());
+    this.DomainModel.deleteMany({}, async () => {
+      this.DomainModel.insertMany(await this.loadDomainsFromFile());
+    });
   }
 
   @Cron(CronExpression.EVERY_HOUR)
