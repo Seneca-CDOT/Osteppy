@@ -96,7 +96,9 @@ export default class SystemService {
 
   constructor(
     @InjectModel(Domain.name) private DomainModel: Model<DomainDocument>,
-  ) {}
+  ) {
+    this.loadDomains();
+  }
 
   private async loadDomainsFromFile() {
     try {
