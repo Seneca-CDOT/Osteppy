@@ -40,5 +40,5 @@ The server uses Nest.JS to manage different modules:
 - Slack API: https://api.slack.com/apps/ACQG3QHBJ
 - Slack API Slash commands: https://api.slack.com/apps/ACQG3QHBJ/slash-commands
 - `Osteppy` is hosted on `spain.cdot.systems:/opt/Osteppy/`
-  - Registed ports config is at `spain.cdot.systems:/opt/Osteppy/config_files/domains.json`
+  - Registered ports config is at `spain.cdot.systems:/opt/Osteppy/config_files/domains.json`
   - Editing the ports requires re-running the server.
