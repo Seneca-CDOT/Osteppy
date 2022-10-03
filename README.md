@@ -30,9 +30,10 @@ The server uses Nest.JS to manage different modules:
     - `COMPOSE_FILE=docker-compose.yml;development.yml` for developing the server.
     - Complete other fields based on the Slack workspace.
 1. Config registered open ports from the example file `cp /config_files/domains.example.json domains.json`.
-1. Run the server with `docker-compose up --build [-d]` (`-d` for detach mode).
+    - Ports checking will automatically run every hour and post results on `PORT_CHECKER_CHANNEL` defined in `.env`.
+3. Run the server with `docker-compose up --build [-d]` (`-d` for detach mode).
     - In development mode, only `database` container runs with `docker-compose`. The `node.js` server runs seperately by `npm run start:dev` for convenience.
-1. Stop the server with `docker-compose down`.
+4. Stop the server with `docker-compose down`.
 
 ## Current setup for OSTEP
 
