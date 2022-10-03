@@ -1,32 +1,43 @@
-Handles End of Day (EoD) slash commands and sending EoD reminders.
+Server backend for Osteppy App - OSTEP that:
 
-## Usage
+- Manage EoDs (End of Day).
+- Check unintended open ports on research machines.
 
-- `/eod`: submits an EoD
-- `/eods_left`: returns a list of who have not submitted their EoD for the day
-- `/set_eod_reminder_channel`: sets the EoD reminder channel
-- `/add_eod_reminder`: adds an EoD reminder
-- `/check_eod_reminders`: returns a list of your EoD reminders
-- `/remove_eod_reminder`: remove an EoD reminder
+## Slash commands on Slack
 
-## Initial setup
+- `/eod`: submits an EoD. EoD can be re-submitted within one day, it'll replace the previous submitted EoD.
+- `/eod :[icon]:` same as above but with custom Slack icon.
+- `/add-to-eod`: add a single task to current EoD.
+- `/remove-from-eod <index>`: remove a single task from current EoD (index starts from `0`).
+- `/list-ports`: list registered ports on research machines.
+- `/list-ports <domain>`: list registered ports on a specific domain (ex. `/list-ports sweden`).
 
-Note: installation scripts only support Linux distributions at the moment
+## Project structure
 
-1. Install systemd package if you don't have it already
+The server uses Nest.JS to manage different modules:
 
-2. Install npm packages
+- `/src/database`: manages database, currently used to store EoDs.
+- `/src/slack`: communicates with Slack server API.
+- `/src/users`: manages RA profiles.
+- `/src/system`: manages port checking.
 
-   `npm install`
+## Installation
 
-3. Run the installation script for Osteppy services
+1. Clone the repo.
+1. Install dependencies via `npm i`
+1. Config environment variables from the example file `cp env.example .env`.
+    - `COMPOSE_FILE=docker-compose.yml;production.yml` or running the server.
+    - `COMPOSE_FILE=docker-compose.yml;development.yml` or developing the server.
+    - Complete other fields based on the Slack workspace.
+1. Config registered open ports from the example file `cp /config_files/domains.example.json domains.json`.
+1. Run the server with `docker-compose up --build [-d]` (`-d` for detach mode).
+    - In development mode, only `database` container runs with `docker-compose`. The `node.js` server runs seperately by `npm run start:dev` for convenience.
+1. Stop the server with `docker-compose down`.
 
-   `Osteppy/src/osteppy_installation.sh`
+## Current setup for OSTEP
 
-## Instructions
-
-### Set up slack token
-
-Store the Slack token as plain text in `Osteppy/config-files/SLACK_TOKEN`
-
-Note: This key is called from the backend, so it should not be available to the public.
+- Slack API: https://api.slack.com/apps/ACQG3QHBJ
+- Slack API Slash commands: https://api.slack.com/apps/ACQG3QHBJ/slash-commands?
+- `Osteppy` is hosted on `spain.cdot.systems:/opt/Osteppy/`
+  - Registed ports config is at `spain.cdot.systems:/opt/Osteppy/config_files/domains.json`
+  - Editing the ports requires re-running the server.
