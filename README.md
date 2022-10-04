@@ -16,7 +16,7 @@ Server backend for Osteppy App - OSTEP that:
 
 The server uses Nest.JS to manage different modules:
 
-- `/src/database`: manages database, currently used to store EoDs.
+- `/src/database`: manages database, currently used to store EoDs and port checking data.
 - `/src/slack`: communicates with Slack server API.
 - `/src/users`: manages RA profiles.
 - `/src/system`: manages port checking.
